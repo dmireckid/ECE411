@@ -71,5 +71,22 @@ typedef enum bit [2:0] {
 } alu_ops;
 
 
+ typedef struct packed {
+    rv32i_opcode opcode;
+    alu_ops aluop;
+    pcmux::pcmux_sel_t pcmux_sel;
+    cmpmux::cmpmux_sel_t cmpmux_sel;
+    alumux::alumux1_sel_t alumux1_sel;
+    alumux::alumux2_sel_t alumux2_sel;
+    regfilemux::regfilemux_sel_t regfilemux_sel;
+    branch_funct3_t cmpop;
+    logic mem_read;
+    logic mem_write;
+    //logic pc_load;   Don't need?
+    logic regfile_load;
+    logic mem_resp;
+
+ } rv32i_control_word;
+
 endpackage : rv32i_types
 
