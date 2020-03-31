@@ -11,8 +11,6 @@ module control_rom(
 );
 
 
-
-
 always_comb
 begin
     /* Default assignments */
@@ -35,93 +33,138 @@ begin
     case(opcode)
         op_lui: begin
             ctrl.regfilemux_sel = regfilemux::u_imm;
-            ctrl.load_regfile = 1'b1;
+            ctrl.regfile_load = 1'b1;
         end
         
         op_auipc: begin
+            ctrl.alumux1_sel = alumux::pc_out;
+            ctrl.alumux2_sel = alumux::u_imm;
             ctrl.aluop = alu_add;
-            ctrl.
-
-
-
-            
-
-
-
-
-
-
-
-
+            ctrl.regfile_load = 1'b1;
         end
 
-       
-
         op_br: begin
+            ctrl.alumux1_sel = alumux::pc_out;
+            ctrl.alumux2_sel = alumux::b_imm;
+            ctrl.aluop = alu_add;
+            ctrl.pcmux_sel = pcmux::alu_out;
+            ctrl.cmpop = branch_funct3_t'(funct3);
         end
 
         op_load: begin
+            ctrl.alumux1_sel = alumux::rs1_out;
+            ctrl.alumux2_sel = alumux::i_imm;
+            ctrl.aluop = alu_add;
+            ctrl.mem_write = 1'b0;
+            ctrl.mem_read = 1'b1;
+            ctrl.regfile_load = 1'b1;
+            ctrl.regfilemux_sel = regfilemux::lw; // TODO: 
         end
 
         op_store: begin
+            ctrl.alumux1_sel = alumux::rs1_out;
+            ctrl.alumux2_sel = alumux::s_imm;
+            ctrl.aluop = alu_add;
+            ctrl.mem_write = 1'b1;
+            ctrl.mem_read = 1'b0;
+            //sb sh sw?
         end
 
         op_imm: begin
-            case (funct3)
+            ctrl.regfile_load = 1;
+            case (arith_funct3_t'(funct3))
                 slt: begin
+                    ctrl.cmpop = blt;
+					ctrl.regfilemux_sel = regfilemux::br_en;
+					ctrl.cmpmux_sel = cmpmux::i_imm;
                 end
 
                 sltu: begin
+                    ctrl.cmpop = bltu;
+                    ctrl.regfilemux_sel = regfilemux::br_en;
+                    ctrl.cmpmux_sel = cmpmux::i_imm;
                 end
 
                 sr: begin
+                    ctrl.alumux1_sel = alumux::rs1_out;
+                    ctrl.alumux2_sel = alumux::i_imm;
                     case (funct7)
-                        7'b0000000: begin
+                        7'b0000000: begin //srl
+                            ctrl.aluop = alu_srl;
                         end
 
-                        7'b0100000: begin
+                        7'b0100000: begin //sra 
+                            ctrl.aluop = alu_sra;
                         end
                     
                     endcase
                 end
 
                 add, sll, axor, aor, aand: begin
-
-                aluop = funct3 // TODO: come back to this 
+                    ctrl.aluop = alu_ops'(funct3);
+                    ctrl.alumux1_sel = alumux::rs1_out;
+                    ctrl.alumux2_sel = alumux::i_imm;
+                    ctrl.regfilemux_sel = regfilemux::alu_out;
                 end
             endcase
         end
 
         op_reg: begin
-            case (funct3)
+            ctrl.regfile_load = 1'b1;
+            case (arith_funct3_t'(funct3))
                 slt: begin
+                    ctrl.cmpop = blt;
+					ctrl.regfilemux_sel = regfilemux::br_en;
+					ctrl.cmpmux_sel = cmpmux::rs2_out;
                 end
 
                 sltu: begin
+                    ctrl.cmpop = bltu;
+					ctrl.regfilemux_sel = regfilemux::br_en;
+					ctrl.cmpmux_sel = cmpmux::rs2_out;
                 end
 
                 sr: begin
                     case (funct7)
                         7'b0000000: begin
+                            ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.aluop = alu_srl;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
 
                         7'b0100000: begin
+                            ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.aluop = alu_sra;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
                     
                     endcase
                 end
 
                 sll, axor, aor, aand: begin
-
-                aluop = funct3 // TODO: come back to this 
+                    ctrl.aluop = alu_ops'(funct3);
+                    ctrl.alumux1_sel = alumux::rs1_out;
+                    ctrl.alumux2_sel = alumux::rs2_out;
+                    ctrl.regfilemux_sel = regfilemux::alu_out;
                 end
+
 
                 add: begin
                     case (funct7)
                         7'b0000000: begin
+                            ctrl.aluop = alu_add;
+                            ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.regfilemux_sel = alu_out;
                         end
 
                         7'b0100000: begin
+                            ctrl.aluop = alu_sub;
+                            ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.regfilemux_sel = alu_out;
                         end
                     endcase
                 end

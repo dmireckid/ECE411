@@ -4,19 +4,15 @@ module IF(
     input clk,
     input rst,
     input pcmux::pcmux_sel_t pcmux_sel,
-    input pc_imm,
+    input rv32i_word pc_imm,
     //input logic pc_load,
-
-    input rv32i_word inst_read,
-    output rv32i_word pc_out,
-
-
+    output rv32i_word pc_out
 );
 
 pc_register pc(
     .clk,
     .rst,
-    .load(clk),  // TODO: come back if error
+    .load(1'b1),  // TODO: come back if error
     .in(pcmux_out),
     .out(pc_out)
 )
