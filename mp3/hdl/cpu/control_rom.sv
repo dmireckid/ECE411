@@ -27,6 +27,7 @@ begin
     //ctrl.pc_load = 1'b0;   Don't need?
     ctrl.regfile_load = 1'b0;
     ctrl.mem_resp = 1'b0;
+    ctrl.mem_byte_enable = 4'b1111;
 
 
     /* Assign control signals based on opcode */

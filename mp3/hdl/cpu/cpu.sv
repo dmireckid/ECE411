@@ -15,19 +15,11 @@ module cpu(
     output logic [31:0] data_wdata
 );
 
-    /*
-    logic data_read;
-    logic data_write;
-    logic [3:0] data_mbe;
-    logic [31:0] data_addr;
-    logic [31:0] data_wdata;
-    logic data_resp;
-    logic [31:0] data_rdata;
-    */
+
 
     //Signals for IF
     rv32i_word pc_out;
-    pcmux::pcmux_sel_t pcmux_sel
+    pcmux::pcmux_sel_t pcmux_sel;
 
     //Signals for IF_ID
     rv32i_word pc_out_IFID, inst_out_IFID;
@@ -47,19 +39,26 @@ module cpu(
     logic [31:0] EX_u_imm_out;
 
     //Signals for EX_MEM
-    logic [4:0] rd_out_EXMEM,
-    rv32i_control_word EXMEM_ctrl_out,
-    rv32i_word alu_out_EXMEM,
-    rv32i_word rs2_out_EXMEM
+    logic [4:0] rd_out_EXMEM;
+    rv32i_control_word EXMEM_ctrl_out;
+    rv32i_word alu_out_EXMEM;
+    rv32i_word rs2_out_EXMEM;
     rv32i_word u_imm_out_EXMEM;
 
     //Signals for MEM
-
+    logic [31:0] MEM_data_read;
+    rv32i_word MEM_alu_out;
+    rv32i_control_word MEM_ctrl_out;
 
     //Signals for MEM_WB
-    
+    rv32i_word read_data_out_MEMWB,
+    rv32i_word u_imm_out_MEMWB,
+    logic [4:0] rd_out_MEMWB,
+    rv32i_word alu_out_MEMWB,
+    rv32i_control_word MEMWB_ctrl_out
 
     //Signals for WB
+    rv32i_word WB_regfilemux_out;
 
     IF(
         .clk,
@@ -88,13 +87,13 @@ module cpu(
         .inst,
         .regfile_in,
         .regfile_load(MEMWB_ctrl_out.regfile_load),
-        .rd(),
+        .rd(rd_out_MEMWB),
         .ID_ctrl_out,
         .rs1_out, 
         .rs2_out,
         .ID_inst_out
     );
-    assign regfile_in = //TODO: Outputted from WB
+    assign regfile_in = WB_regfilemux_out //TODO: Outputted from WB
 
     ID_EX(
         .clk,
@@ -116,11 +115,11 @@ module cpu(
         .rs1_in(rs1_out),
         .rs2_in(rs2_out),
         .EX_ctrl_in(IDEX_ctrl_out),
-        .pc_in,
+        .pc_in(pc_out_IDEX),
         .EX_rs2_out,
         .alu_out,
         .EX_ctrl_out,
-        .rd
+        .rd,
         .EX_u_imm_out
     );
 
@@ -134,11 +133,28 @@ module cpu(
         .u_imm_out_EXMEM(EX_u_imm_out),
         .rd_out_EXMEM,
         .EXMEM_ctrl_out,
-        .rv32i_word alu_out_EXMEM,
-        .rv32i_word rs2_out_EXMEM
+        .alu_out_EXMEM,
+        .rs2_out_EXMEM
     );
 
     MEM(
+        .clk,
+        .rst,
+        .inst,
+        .pc_in,
+        .rs2_in,
+        .MEM_ctrl_in,
+        .data_rdata,
+        .alu_out_in,
+
+        .data_wdata,
+        .data_addr,
+        .data_mbe
+        .data_read,
+        .data_write,
+        .MEM_data_read,
+        .MEM_alu_out,
+        .MEM_ctrl_out
 
 
     );
@@ -146,30 +162,28 @@ module cpu(
     MEM_WB(
         .clk,
         .rst,
-        .read_data,
+        .read_data(MEM_data_read),
         .u_imm_out_EXMEM,
         .rd_out_EXMEM,
         .alu_out_EXMEM,
         .MEM_ctrl_out,
-        output rv32i_word read_data_out_MEMWB,
-        output rv32i_word u_imm_out_MEMWB,
-        output logic [4:0] rd_out_MEMWB,
-        output rv32i_word alu_out_MEMWB,
-        output rv32i_control_word MEMWB_ctrl_out
+        .read_data_out_MEMWB,
+        .u_imm_out_MEMWB,
+        .rd_out_MEMWB,
+        .alu_out_MEMWB,
+        .MEMWB_ctrl_out
     );
 
 
     WB(
-        input clk,
-        input rst,
-        input [31:0] WB_u_imm_in,
-        input rv32i_control_word WB_ctrl_in,
-        input rv32i_word WB_alu_in,
-        input rv32i_word WB_mem_in, 
+        .clk,
+        .rst,
+        .WB_u_imm_in(u_imm_out_MEMWB),
+        .WB_ctrl_in(MEMWB_ctrl_out),
+        .WB_alu_in(alu_out_MEMWB),
+        .WB_mem_in(read_data_out_MEMWB), 
 
-        output rv32i_word WB_regfilemux_out
-
-
+        .WB_regfilemux_out
     );
 
 
