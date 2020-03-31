@@ -9,11 +9,12 @@ module MEM(
     input rv32i_word rs2_in,
     input rv32i_control_world MEM_ctrl_in,
 
-
+    input rv32i_word alu_out_in,
+    
 
 );
 
-    
+
 
 
 

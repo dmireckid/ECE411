@@ -85,6 +85,7 @@ typedef enum bit [2:0] {
     //logic pc_load;   Don't need?
     logic regfile_load;
     logic mem_resp;
+    logic [3:0] mem_byte_enable
 
  } rv32i_control_word;
 
