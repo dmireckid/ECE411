@@ -39,7 +39,7 @@ register #(.width($bits(rv32i_control_word))) ctrl_IDEX(
     .out(IDEX_ctrl_out)
 );
 
-register rs1_out_IDEX(
+register rs1_IDEX(
     .clk,
     .rst,
     .load(1'b1),
@@ -47,7 +47,7 @@ register rs1_out_IDEX(
     .out(rs1_out_IDEX)
 );
 
-register rs2_out_IDEX(
+register rs2_IDEX(
     .clk,
     .rst,
     .load(1'b1),

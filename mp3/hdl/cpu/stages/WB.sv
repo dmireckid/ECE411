@@ -30,5 +30,6 @@ always_comb begin: Muxes
         regfilemux::u_imm   : regfilemux_out = u_imm;
         regfilemux::lw      : regfilemux_out = mem_in;
     endcase
+end
 
 endmodule : WB

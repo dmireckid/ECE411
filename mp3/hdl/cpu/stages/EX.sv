@@ -27,6 +27,7 @@ logic cmp_out;
 
 assign EX_rs1_in = rs1_in;
 assign EX_rs2_in = rs2_in;
+assign EX_rs2_out = EX_rs2_in;
 
 //Imm Gen
 assign i_imm = {{21{inst[31]}}, inst[30:20]};
@@ -52,8 +53,11 @@ alu alu(
     .f(alu_out)
 );
 
-assign EX_ctrl_in.pcmux_sel = cmp_out;
+
 assign EX_ctrl_out = EX_ctrl_in;
+assign EX_ctrl_out.pcmux_sel = pcmux::pc_plus4;
+
+
 
 //assign alu_mod2 = {alu_out[31:1], 1'b0};
 
@@ -76,6 +80,7 @@ always_comb begin: Muxes
         cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
         cmpmux::i_imm    : cmpmux_out = i_imm;
     endcase
+end
     
 
 endmodule : EX

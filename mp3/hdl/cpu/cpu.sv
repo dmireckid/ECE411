@@ -4,6 +4,7 @@ module cpu(
     input clk,
     input rst,
     input [31:0] inst_rdata,
+	 input [31:0] data_rdata,
 
 
     output inst_read,
@@ -29,12 +30,13 @@ module cpu(
     rv32i_word rs1_out, rs2_out, ID_inst_out;
 
     //Signals for ID_EX
-    rv32i_word inst_out_IDEX, pc_out_IDEX; 
+    rv32i_word inst_out_IDEX, pc_out_IDEX, rs1_out_IDEX, rs2_out_IDEX; 
     rv32i_control_word IDEX_ctrl_out;
 
     //Signals for EX
     rv32i_control_word EX_ctrl_out;
     rv32i_word EX_pc_imm, alu_out;
+	 rv32i_word EX_rs2_out;
     logic [4:0] rd;
     logic [31:0] EX_u_imm_out;
 
@@ -51,14 +53,15 @@ module cpu(
     rv32i_control_word MEM_ctrl_out;
 
     //Signals for MEM_WB
-    rv32i_word read_data_out_MEMWB,
-    rv32i_word u_imm_out_MEMWB,
-    logic [4:0] rd_out_MEMWB,
-    rv32i_word alu_out_MEMWB,
-    rv32i_control_word MEMWB_ctrl_out
+    rv32i_word read_data_out_MEMWB;
+    rv32i_word u_imm_out_MEMWB;
+    logic [4:0] rd_out_MEMWB;
+    rv32i_word alu_out_MEMWB;
+    rv32i_control_word MEMWB_ctrl_out;
 
     //Signals for WB
     rv32i_word WB_regfilemux_out;
+	 rv32i_word regfile_in;
 
     IF(
         .clk,
@@ -84,7 +87,7 @@ module cpu(
     ID(
         .clk,
         .rst,
-        .inst,
+        .inst(inst_out_IFID),
         .regfile_in,
         .regfile_load(MEMWB_ctrl_out.regfile_load),
         .rd(rd_out_MEMWB),
@@ -93,7 +96,7 @@ module cpu(
         .rs2_out,
         .ID_inst_out
     );
-    assign regfile_in = WB_regfilemux_out //TODO: Outputted from WB
+    assign regfile_in = WB_regfilemux_out; //TODO: Outputted from WB
 
     ID_EX(
         .clk,
@@ -105,15 +108,17 @@ module cpu(
         .rs2_out,
         .pc_out_IDEX,
         .IDEX_ctrl_out,
-        .inst_out_IDEX
+        .inst_out_IDEX,
+		  .rs1_out_IDEX,
+		  .rs2_out_IDEX
     );
 
     EX(
         .clk,
         .rst,
         .inst(inst_out_IDEX),
-        .rs1_in(rs1_out),
-        .rs2_in(rs2_out),
+        .rs1_in(rs1_out_IDEX),
+        .rs2_in(rs2_out_IDEX),
         .EX_ctrl_in(IDEX_ctrl_out),
         .pc_in(pc_out_IDEX),
         .EX_rs2_out,
@@ -140,23 +145,19 @@ module cpu(
     MEM(
         .clk,
         .rst,
-        .inst,
-        .pc_in,
-        .rs2_in,
-        .MEM_ctrl_in,
+        .rs2_in(rs2_out_EXMEM),
+        .MEM_ctrl_in(EXMEM_ctrl_out),
         .data_rdata,
-        .alu_out_in,
+        .alu_out_in(alu_out_EXMEM),
 
         .data_wdata,
         .data_addr,
-        .data_mbe
+        .data_mbe,
         .data_read,
         .data_write,
         .MEM_data_read,
         .MEM_alu_out,
         .MEM_ctrl_out
-
-
     );
 
     MEM_WB(

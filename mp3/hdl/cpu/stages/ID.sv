@@ -13,14 +13,12 @@ module ID(
     output rv32i_control_word ID_ctrl_out,
 
     output rv32i_word rs1_out, 
-    output rv32i_word rs2_out
+    output rv32i_word rs2_out,
     output rv32i_word ID_inst_out
 );
 
-rv32i_word ID_inst_out;
 assign ID_inst_out = inst;
 rv32i_control_word ctrl_out;
-rv32i_word rs1_out, rs2_out;
 rv32i_opcode opcode;
 logic [4:0] rs1, rs2;
 logic [2:0] funct3;

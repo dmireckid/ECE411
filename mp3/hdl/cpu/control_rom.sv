@@ -158,14 +158,14 @@ begin
                             ctrl.aluop = alu_add;
                             ctrl.alumux1_sel = alumux::rs1_out;
                             ctrl.alumux2_sel = alumux::rs2_out;
-                            ctrl.regfilemux_sel = alu_out;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
 
                         7'b0100000: begin
                             ctrl.aluop = alu_sub;
                             ctrl.alumux1_sel = alumux::rs1_out;
                             ctrl.alumux2_sel = alumux::rs2_out;
-                            ctrl.regfilemux_sel = alu_out;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
                     endcase
                 end
