@@ -67,12 +67,12 @@ module cpu(
         .clk,
         .rst,
         .pcmux_sel,
-        .pc_imm(EX_pc_imm),
+        .pc_imm(alu_out_EXMEM),
         //input logic pc_load,
+		  .inst_read,
+		  .inst_addr,
         .pc_out
     );
-    assign inst_read = 1'b1;
-    assign inst_addr = pc_out;
     assign pcmux_sel = EX_ctrl_out.pcmux_sel;
 
     IF_ID IF_ID(
@@ -135,8 +135,9 @@ module cpu(
         .rs2_out_IDEX,
         .alu_out,
         .IDEX_ctrl_out,
+		  .EX_u_imm_in(EX_u_imm_out),
         .rd,
-        .u_imm_out_EXMEM(EX_u_imm_out),
+        .u_imm_out_EXMEM,
         .rd_out_EXMEM,
         .EXMEM_ctrl_out,
         .alu_out_EXMEM,
@@ -152,7 +153,6 @@ module cpu(
         .MEM_ctrl_in(EXMEM_ctrl_out),
         .data_rdata,
         .alu_out_in(alu_out_EXMEM),
-
         .data_wdata,
         .data_addr,
         .data_mbe,

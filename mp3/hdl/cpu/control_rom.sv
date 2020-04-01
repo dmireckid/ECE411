@@ -89,7 +89,7 @@ begin
                 sr: begin
                     ctrl.alumux1_sel = alumux::rs1_out;
                     ctrl.alumux2_sel = alumux::i_imm;
-                    unique case (funct7)
+                    case (funct7)
                         7'b0000000: begin //srl
                             ctrl.aluop = alu_srl;
                         end
@@ -97,7 +97,8 @@ begin
                         7'b0100000: begin //sra 
                             ctrl.aluop = alu_sra;
                         end
-                    
+								
+								default: ctrl.aluop = alu_srl;
                     endcase
                 end
 
@@ -115,18 +116,18 @@ begin
             case (arith_funct3_t'(funct3))
                 slt: begin
                     ctrl.cmpop = blt;
-					ctrl.regfilemux_sel = regfilemux::br_en;
-					ctrl.cmpmux_sel = cmpmux::rs2_out;
+							ctrl.regfilemux_sel = regfilemux::br_en;
+							ctrl.cmpmux_sel = cmpmux::rs2_out;
                 end
 
                 sltu: begin
-                    ctrl.cmpop = bltu;
-					ctrl.regfilemux_sel = regfilemux::br_en;
-					ctrl.cmpmux_sel = cmpmux::rs2_out;
+                     ctrl.cmpop = bltu;
+							ctrl.regfilemux_sel = regfilemux::br_en;
+							ctrl.cmpmux_sel = cmpmux::rs2_out;
                 end
 
                 sr: begin
-                    unique case (funct7)
+							case (funct7)
                         7'b0000000: begin
                             ctrl.alumux1_sel = alumux::rs1_out;
                             ctrl.alumux2_sel = alumux::rs2_out;
@@ -140,7 +141,13 @@ begin
                             ctrl.aluop = alu_sra;
                             ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
-                    
+								
+								default: begin
+									 ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.aluop = alu_srl;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
+								end
                     endcase
                 end
 
@@ -153,7 +160,7 @@ begin
 
 
                 add: begin
-                    unique case (funct7)
+                    case (funct7)
                         7'b0000000: begin
                             ctrl.aluop = alu_add;
                             ctrl.alumux1_sel = alumux::rs1_out;
@@ -167,6 +174,13 @@ begin
                             ctrl.alumux2_sel = alumux::rs2_out;
                             ctrl.regfilemux_sel = regfilemux::alu_out;
                         end
+								
+								default: begin
+									 ctrl.aluop = alu_add;
+                            ctrl.alumux1_sel = alumux::rs1_out;
+                            ctrl.alumux2_sel = alumux::rs2_out;
+                            ctrl.regfilemux_sel = regfilemux::alu_out;
+								end
                     endcase
                 end
             endcase

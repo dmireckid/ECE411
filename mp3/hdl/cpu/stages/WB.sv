@@ -28,6 +28,7 @@ always_comb begin: Muxes
         regfilemux::br_en   : regfilemux_out = {30'd0, WB_ctrl_in.pcmux_sel};
         regfilemux::u_imm   : regfilemux_out = u_imm_in;
         regfilemux::lw      : regfilemux_out = mem_in;
+		  default: regfilemux_out = WB_alu_in;
     endcase
 end
 

@@ -6,10 +6,15 @@ module IF(
     input pcmux::pcmux_sel_t pcmux_sel,
     input rv32i_word pc_imm,
     //input logic pc_load,
-    output rv32i_word pc_out
+    output rv32i_word pc_out,
+	 output logic [31:0] inst_addr,
+	 output logic inst_read
 );
 
 rv32i_word pcmux_out;
+
+assign inst_read = 1'b1;
+assign inst_addr = pc_out;
 
 pc_register pc(
     .clk,
@@ -23,6 +28,7 @@ always_comb begin : MUXES
     unique case (pcmux_sel)
         pcmux::pc_plus4: pcmux_out = pc_out + 4;
         pcmux::alu_out : pcmux_out = pc_imm;
+		  default: pcmux_out = pc_out + 4;
 	 endcase
 end
 

@@ -22,7 +22,7 @@ module MEM(
     assign data_mbe = MEM_ctrl_in.mem_byte_enable;
     assign data_read = MEM_ctrl_in.mem_read;
     assign data_write = MEM_ctrl_in.mem_write;
-    assign data_addr = {alu_out_in[31:2], 2'd0};
+    assign data_addr = {alu_out_in[31:2], 2'b0};
     assign MEM_data_read = data_rdata;
 	 assign data_wdata = rs2_in;
     assign MEM_alu_out = alu_out_in;
