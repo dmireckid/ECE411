@@ -30,10 +30,42 @@ always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modif
 /*********************** End Shadow Memory Assignments ***********************/
 
 // Set this to the proper value
-assign itf.registers = '{default: '0};
+/* I Cache Ports */
+logic inst_read;
+logic [31:0] inst_addr;
+logic inst_resp;
+logic [31:0] inst_rdata;
+
+/* D Cache Ports */
+logic data_read;
+logic data_write;
+logic [3:0] data_mbe;
+logic [31:0] data_addr;
+logic [31:0] data_wdata;
+logic data_resp;
+logic [31:0] data_rdata;
+bit clk, rst;
+assign itf.registers = dut.cpu.ID.regfile.data;
+assign itf.clk = clk;
+assign itf.rst = rst;
+assign itf.data_read = data_read;
+assign itf.data_write = data_write;
+assign itf.data_mbe = data_mbe;
+assign itf.data_addr = data_addr;
+assign itf.data_wdata = data_wdata;
+assign itf.data_resp = data_resp;
+assign itf.data_rdata = data_rdata;
+
+/*
+assign itf.halt = dut.load_pc & (dut.datapath.pc_out == dut.datapath.pcmux_out);
+
+
+*/
+
+
 
 /*********************** Instantiate your design here ************************/
-mp3 dut();
+mp3 dut(.*);
 /***************************** End Instantiation *****************************/
 
 endmodule
