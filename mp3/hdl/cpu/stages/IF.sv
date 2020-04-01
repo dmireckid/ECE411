@@ -9,6 +9,8 @@ module IF(
     output rv32i_word pc_out
 );
 
+rv32i_word pcmux_out;
+
 pc_register pc(
     .clk,
     .rst,

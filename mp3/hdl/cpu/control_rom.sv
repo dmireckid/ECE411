@@ -89,7 +89,7 @@ begin
                 sr: begin
                     ctrl.alumux1_sel = alumux::rs1_out;
                     ctrl.alumux2_sel = alumux::i_imm;
-                    case (funct7)
+                    unique case (funct7)
                         7'b0000000: begin //srl
                             ctrl.aluop = alu_srl;
                         end
@@ -126,7 +126,7 @@ begin
                 end
 
                 sr: begin
-                    case (funct7)
+                    unique case (funct7)
                         7'b0000000: begin
                             ctrl.alumux1_sel = alumux::rs1_out;
                             ctrl.alumux2_sel = alumux::rs2_out;
@@ -153,7 +153,7 @@ begin
 
 
                 add: begin
-                    case (funct7)
+                    unique case (funct7)
                         7'b0000000: begin
                             ctrl.aluop = alu_add;
                             ctrl.alumux1_sel = alumux::rs1_out;

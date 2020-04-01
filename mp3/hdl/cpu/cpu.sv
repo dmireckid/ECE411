@@ -128,6 +128,7 @@ module cpu(
         .EX_u_imm_out
     );
 
+
     EX_MEM(
         .clk,
         .rst,
@@ -142,6 +143,8 @@ module cpu(
         .rs2_out_EXMEM
     );
 
+	 
+	 
     MEM(
         .clk,
         .rst,

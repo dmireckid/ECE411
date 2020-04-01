@@ -22,8 +22,8 @@ register inst_IFID(
     .clk,
     .rst,
     .load(1'b1),
-    .in(rdata_a),
-    .out(rdata_a_IFID)
+    .in(inst_rdata),
+    .out(inst_out_IFID)
 );
 
 

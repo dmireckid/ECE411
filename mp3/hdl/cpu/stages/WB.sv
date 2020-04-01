@@ -19,15 +19,14 @@ module WB(
 rv32i_word regfilemux_out, alu_in, u_imm_in, mem_in;
 
 assign WB_regfilemux_out = regfilemux_out;
-assign alu_in = WB_alu_in;
-assign u_imm = WB_u_imm_in;
+assign u_imm_in = WB_u_imm_in;
 assign mem_in = WB_mem_in;
 
 always_comb begin: Muxes
     unique case (WB_ctrl_in.regfilemux_sel)
         regfilemux::alu_out : regfilemux_out = WB_alu_in;
         regfilemux::br_en   : regfilemux_out = {31'd0, WB_ctrl_in.pcmux_sel};
-        regfilemux::u_imm   : regfilemux_out = u_imm;
+        regfilemux::u_imm   : regfilemux_out = u_imm_in;
         regfilemux::lw      : regfilemux_out = mem_in;
     endcase
 end

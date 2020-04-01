@@ -37,6 +37,8 @@ assign u_imm = {inst[31:12], 12'h000};
 assign j_imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
 assign rd = inst[11:7];
 
+assign EX_ctrl_out = EX_ctrl_in;
+
 assign EX_u_imm_out = u_imm;
 
 cmp cmp(
@@ -48,23 +50,23 @@ cmp cmp(
 
 alu alu(
     .aluop(EX_ctrl_in.aluop),
-    .a(alumux1_out), 
-    .b(alumux2_out),
+    .a(alu_mux1_out), 
+    .b(alu_mux2_out),
     .f(alu_out)
 );
 
 
-assign EX_ctrl_out = EX_ctrl_in;
-assign EX_ctrl_out.pcmux_sel = pcmux::pc_plus4;
+
+//assign EX_ctrl_out.pcmux_sel = pcmux::pc_plus4;
 
 
-
-//assign alu_mod2 = {alu_out[31:1], 1'b0};
+assign alu_mod2 = {alu_out[31:1], 1'b0};
 
 always_comb begin: Muxes
     unique case (EX_ctrl_in.alumux1_sel) // alumux1
         alumux::rs1_out: alu_mux1_out = EX_rs1_in;
         alumux::pc_out : alu_mux1_out = pc_in;
+		  default: alu_mux1_out = EX_rs1_in;
     endcase
 
     unique case (EX_ctrl_in.alumux2_sel) // alumux2
@@ -74,6 +76,7 @@ always_comb begin: Muxes
         alumux::s_imm : alu_mux2_out = s_imm;
         alumux::j_imm : alu_mux2_out = j_imm;
         alumux::rs2_out : alu_mux2_out = EX_rs2_in;
+		  default: alu_mux2_out = EX_rs2_in;
     endcase
 
     unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
