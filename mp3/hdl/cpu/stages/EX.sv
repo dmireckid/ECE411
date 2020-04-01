@@ -19,7 +19,7 @@ module EX(
 
 logic [31:0] i_imm, s_imm, b_imm, u_imm, j_imm;
 rv32i_word alu_mux1_out;
-rv32i_word alu_mux2_out;
+rv32i_word alu_mux2_out, alu_mod2;
 rv32i_word EX_rs1_in, EX_rs2_in;
 rv32i_word cmpmux_out;
 

@@ -25,7 +25,7 @@ assign mem_in = WB_mem_in;
 always_comb begin: Muxes
     unique case (WB_ctrl_in.regfilemux_sel)
         regfilemux::alu_out : regfilemux_out = WB_alu_in;
-        regfilemux::br_en   : regfilemux_out = {31'd0, WB_ctrl_in.pcmux_sel};
+        regfilemux::br_en   : regfilemux_out = {30'd0, WB_ctrl_in.pcmux_sel};
         regfilemux::u_imm   : regfilemux_out = u_imm_in;
         regfilemux::lw      : regfilemux_out = mem_in;
     endcase

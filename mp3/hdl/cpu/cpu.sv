@@ -63,7 +63,7 @@ module cpu(
     rv32i_word WB_regfilemux_out;
 	 rv32i_word regfile_in;
 
-    IF(
+    IF IF(
         .clk,
         .rst,
         .pcmux_sel,
@@ -75,7 +75,7 @@ module cpu(
     assign inst_addr = pc_out;
     assign pcmux_sel = EX_ctrl_out.pcmux_sel;
 
-    IF_ID(
+    IF_ID IF_ID(
         .clk,
         .rst,
         .pc_out,
@@ -84,7 +84,7 @@ module cpu(
         .inst_out_IFID
     );
 
-    ID(
+    ID ID(
         .clk,
         .rst,
         .inst(inst_out_IFID),
@@ -98,7 +98,7 @@ module cpu(
     );
     assign regfile_in = WB_regfilemux_out; //TODO: Outputted from WB
 
-    ID_EX(
+    ID_EX ID_EX(
         .clk,
         .rst,
         .pc_out_IFID,
@@ -113,7 +113,7 @@ module cpu(
 		  .rs2_out_IDEX
     );
 
-    EX(
+    EX EX(
         .clk,
         .rst,
         .inst(inst_out_IDEX),
@@ -129,7 +129,7 @@ module cpu(
     );
 
 
-    EX_MEM(
+    EX_MEM EX_MEM(
         .clk,
         .rst,
         .rs2_out_IDEX,
@@ -145,7 +145,7 @@ module cpu(
 
 	 
 	 
-    MEM(
+    MEM MEM(
         .clk,
         .rst,
         .rs2_in(rs2_out_EXMEM),
@@ -163,7 +163,7 @@ module cpu(
         .MEM_ctrl_out
     );
 
-    MEM_WB(
+    MEM_WB MEM_WB(
         .clk,
         .rst,
         .read_data(MEM_data_read),
@@ -179,7 +179,7 @@ module cpu(
     );
 
 
-    WB(
+    WB WB(
         .clk,
         .rst,
         .WB_u_imm_in(u_imm_out_MEMWB),
