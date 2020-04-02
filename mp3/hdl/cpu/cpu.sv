@@ -39,6 +39,7 @@ module cpu(
 	 rv32i_word EX_rs2_out;
     logic [4:0] rd;
     logic [31:0] EX_u_imm_out;
+	 rv32i_word EX_alu_mod2;
 
     //Signals for EX_MEM
     logic [4:0] rd_out_EXMEM;
@@ -68,12 +69,13 @@ module cpu(
         .rst,
         .pcmux_sel,
         .pc_imm(alu_out_EXMEM),
+		  .pc_alu_mod2(EX_alu_mod2),
         //input logic pc_load,
 		  .inst_read,
 		  .inst_addr,
         .pc_out
     );
-    assign pcmux_sel = EX_ctrl_out.pcmux_sel;
+    //assign pcmux_sel = EX_ctrl_out.pcmux_sel;
 
     IF_ID IF_ID(
         .clk,
@@ -125,7 +127,9 @@ module cpu(
         .alu_out,
         .EX_ctrl_out,
         .rd,
-        .EX_u_imm_out
+        .EX_u_imm_out,
+		  .EX_alu_mod2,
+		  .pcmux_sel
     );
 
 

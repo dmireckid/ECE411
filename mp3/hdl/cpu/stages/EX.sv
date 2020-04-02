@@ -13,7 +13,9 @@ module EX(
     output rv32i_word alu_out,
     output rv32i_control_word EX_ctrl_out,
     output logic [4:0] rd,
-    output [31:0] EX_u_imm_out
+    output [31:0] EX_u_imm_out,
+	 output rv32i_word EX_alu_mod2,
+	 output pcmux::pcmux_sel_t pcmux_sel
 );
 
 
@@ -40,6 +42,8 @@ assign rd = inst[11:7];
 assign EX_ctrl_out = EX_ctrl_in;
 
 assign EX_u_imm_out = u_imm;
+assign pcmux_sel = EX_ctrl_out.pcmux_sel;
+
 
 cmp cmp(
     .input1(EX_rs1_in),
@@ -61,6 +65,7 @@ alu alu(
 
 
 assign alu_mod2 = {alu_out[31:1], 1'b0};
+assign EX_alu_mod2 = alu_mod2;
 
 always_comb begin: Muxes
     unique case (EX_ctrl_in.alumux1_sel) // alumux1
