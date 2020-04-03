@@ -55,6 +55,7 @@ module cpu(
     logic [31:0] MEM_data_read;
     rv32i_word MEM_alu_out;
     rv32i_control_word MEM_ctrl_out;
+	 logic [4:0] MEM_rd_in, MEM_rd_out;
 
     //Signals for MEM_WB
     rv32i_word read_data_out_MEMWB;
@@ -97,7 +98,7 @@ module cpu(
         .inst(inst_out_IFID),
         .regfile_in(WB_regfilemux_out),
         .regfile_load(WB_ctrl_out.regfile_load),
-        .ID_rd(WB_rd_out),
+        .ID_rd(rd_out_MEMWB),
         .ID_ctrl_out,
         .rs1_out, 
         .rs2_out,
@@ -162,6 +163,7 @@ module cpu(
         .MEM_ctrl_in(EXMEM_ctrl_out),
         .data_rdata,
         .alu_out_in(alu_out_EXMEM),
+		  .MEM_rd_in(rd_out_EXMEM),
         .data_wdata,
         .data_addr,
         .data_mbe,
@@ -169,7 +171,8 @@ module cpu(
         .data_write,
         .MEM_data_read,
         .MEM_alu_out,
-        .MEM_ctrl_out
+        .MEM_ctrl_out,
+		  .MEM_rd_out
     );
 
     MEM_WB MEM_WB(
@@ -177,7 +180,7 @@ module cpu(
         .rst,
         .read_data(MEM_data_read),
         .u_imm_out_EXMEM,
-        .rd_out_EXMEM,
+        .MEMWB_rd_in(MEM_rd_out),
         .alu_out_EXMEM,
         .MEM_ctrl_out,
         .read_data_out_MEMWB,
@@ -192,7 +195,7 @@ module cpu(
         .clk,
         .rst,
         .WB_u_imm_in(u_imm_out_MEMWB),
-		  .WB_rd_in(rd_out_EXMEM),
+		  .WB_rd_in(rd_out_MEMWB),
         .WB_ctrl_in(MEMWB_ctrl_out),
         .WB_alu_in(alu_out_MEMWB),
         .WB_mem_in(read_data_out_MEMWB), 

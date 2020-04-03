@@ -7,6 +7,7 @@ module MEM(
     input rv32i_control_word MEM_ctrl_in,
     input logic [31:0] data_rdata,
     input rv32i_word alu_out_in,
+	 input logic [4:0] MEM_rd_in,
 
     output logic [31:0] data_wdata,
     output logic [31:0] data_addr,
@@ -15,7 +16,8 @@ module MEM(
     output logic data_write,
     output logic [31:0] MEM_data_read,
     output rv32i_word MEM_alu_out,
-    output rv32i_control_word MEM_ctrl_out
+    output rv32i_control_word MEM_ctrl_out,
+	 output logic [4:0] MEM_rd_out
 );
 
 
@@ -27,6 +29,7 @@ module MEM(
 	 assign data_wdata = rs2_in;
     assign MEM_alu_out = alu_out_in;
     assign MEM_ctrl_out = MEM_ctrl_in;
+	 assign MEM_rd_out = MEM_rd_in;
 
 
 endmodule : MEM

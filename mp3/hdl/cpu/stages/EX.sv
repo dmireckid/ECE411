@@ -42,7 +42,7 @@ assign rd = inst[11:7];
 assign EX_ctrl_out = EX_ctrl_in;
 
 assign EX_u_imm_out = u_imm;
-assign pcmux_sel = EX_ctrl_out.pcmux_sel;
+assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
 
 
 cmp cmp(

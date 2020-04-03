@@ -5,7 +5,7 @@ module MEM_WB(
     input rst,
     input logic [31:0] read_data,
     input rv32i_word u_imm_out_EXMEM,
-    input logic [4:0] rd_out_EXMEM,
+    input logic [4:0] MEMWB_rd_in,
     input rv32i_word alu_out_EXMEM,
     input rv32i_control_word MEM_ctrl_out,
     output rv32i_word read_data_out_MEMWB,
@@ -43,7 +43,7 @@ register #(.width(5)) rd_MEMWB(
     .clk,
     .rst,
     .load(1'b1),
-    .in(rd_out_EXMEM),
+    .in(MEMWB_rd_in),
     .out(rd_out_MEMWB)
 );
 
