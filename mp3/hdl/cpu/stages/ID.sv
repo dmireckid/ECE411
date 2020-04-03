@@ -7,7 +7,7 @@ module ID(
     input rv32i_word inst,
     input rv32i_word regfile_in,
     input logic regfile_load,
-    input logic [4:0] rd,
+    input logic [4:0] ID_rd,
     
     
     output rv32i_control_word ID_ctrl_out,
@@ -48,7 +48,7 @@ regfile regfile(
     .in(regfile_in),
     .src_a(rs1), 
     .src_b(rs2), 
-    .dest(rd),
+    .dest(ID_rd),
     .reg_a(rs1_out), 
     .reg_b(rs2_out)
 );

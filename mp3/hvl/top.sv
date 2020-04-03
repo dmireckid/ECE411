@@ -34,35 +34,33 @@ assign itf.registers = dut.cpu.ID.regfile.data;
 //assign rvfi.halt = 1'b1 & (dut.cpu.pc_out == dut.cpu.IF.pcmux_out);
 
 bit clk;
-bit rst;
+//bit rst;
 /* I Cache Ports */
 logic inst_read;
-logic [31:0] inst_addr;
-logic inst_resp;
+//logic [31:0] inst_addr;
+//logic inst_resp;
 logic [31:0] inst_rdata;
 
 /* D Cache Ports */
 logic data_read;
 logic data_write;
-logic [3:0] data_mbe;
-logic [31:0] data_addr;
+//logic [3:0] data_mbe;
+//logic [31:0] data_addr;
 logic [31:0] data_wdata;
-logic data_resp;
+//logic data_resp;
 logic [31:0] data_rdata;
 
-logic [31:0] registers[32];
 
-assign registers = itf.registers;
 
 assign clk = itf.clk;
-assign rst = itf.rst;
+//assign rst = itf.rst;
 assign inst_addr = itf.inst_addr;
 assign inst_rdata = itf.inst_rdata;
-assign data_addr = itf.data_addr;
+//assign data_addr = itf.data_addr;
 assign data_rdata = itf.data_rdata;
 assign data_wdata = itf.data_wdata;
-assign inst_resp = itf.inst_resp;
-assign data_resp = itf.data_resp;
+//assign inst_resp = itf.inst_resp;
+//assign data_resp = itf.data_resp;
 assign inst_read = itf.inst_read;
 assign data_read = itf.data_read;
 assign data_write = itf.data_write;
@@ -70,6 +68,25 @@ assign data_write = itf.data_write;
 
 logic [31:0] pc;
 assign pc = dut.cpu.pc_out;
+
+logic [1:0] pcmux_sel;
+assign pcmux_sel = dut.cpu.pcmux_sel;
+
+logic [31:0] EX_alu_out;
+assign EX_alu_out = dut.cpu.alu_out;
+
+logic [31:0] pc_imm;
+assign pc_imm = dut.cpu.IF.pc_imm;
+
+logic [31:0] regfile_in;
+assign regfile_in = dut.cpu.ID.regfile_in;
+
+logic regfile_load;
+assign regfile_load = dut.cpu.ID.regfile_load;
+
+logic [4:0] regfile_dest;
+assign regfile_dest = dut.cpu.ID.ID_rd;
+
 
 
 

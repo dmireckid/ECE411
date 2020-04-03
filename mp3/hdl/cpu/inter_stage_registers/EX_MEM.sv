@@ -6,7 +6,7 @@ module EX_MEM(
     input rv32i_word rs2_out_IDEX,
     input rv32i_word alu_out,
     input rv32i_word IDEX_ctrl_out,
-    input logic [4:0] rd,
+    input logic [4:0] rd_in,
     input rv32i_word EX_u_imm_in,
     output logic [4:0] rd_out_EXMEM,
     output rv32i_control_word EXMEM_ctrl_out,
@@ -43,7 +43,7 @@ register #(.width(5)) rd_EXMEM(
     .clk,
     .rst,
     .load(1'b1),
-    .in(rd),
+    .in(rd_in),
     .out(rd_out_EXMEM)
 );
 

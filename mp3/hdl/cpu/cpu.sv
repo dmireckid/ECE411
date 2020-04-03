@@ -21,6 +21,7 @@ module cpu(
     //Signals for IF
     rv32i_word pc_out;
     pcmux::pcmux_sel_t pcmux_sel;
+	 rv32i_word pc_imm;
 
     //Signals for IF_ID
     rv32i_word pc_out_IFID, inst_out_IFID;
@@ -28,6 +29,7 @@ module cpu(
     //Signals for ID
     rv32i_control_word ID_ctrl_out;
     rv32i_word rs1_out, rs2_out, ID_inst_out;
+	 logic [4:0] ID_rd;
 
     //Signals for ID_EX
     rv32i_word inst_out_IDEX, pc_out_IDEX, rs1_out_IDEX, rs2_out_IDEX; 
@@ -42,6 +44,7 @@ module cpu(
 	 rv32i_word EX_alu_mod2;
 
     //Signals for EX_MEM
+	 logic [4:0] rd_in;
     logic [4:0] rd_out_EXMEM;
     rv32i_control_word EXMEM_ctrl_out;
     rv32i_word alu_out_EXMEM;
@@ -63,12 +66,14 @@ module cpu(
     //Signals for WB
     rv32i_word WB_regfilemux_out;
 	 rv32i_word regfile_in;
+	 rv32i_control_word WB_ctrl_out;
+	 logic [4:0] WB_rd_out;
 
     IF IF(
         .clk,
         .rst,
         .pcmux_sel,
-        .pc_imm(alu_out_EXMEM),
+        .pc_imm(alu_out),
 		  .pc_alu_mod2(EX_alu_mod2),
         //input logic pc_load,
 		  .inst_read,
@@ -90,15 +95,15 @@ module cpu(
         .clk,
         .rst,
         .inst(inst_out_IFID),
-        .regfile_in,
-        .regfile_load(MEMWB_ctrl_out.regfile_load),
-        .rd(rd_out_MEMWB),
+        .regfile_in(WB_regfilemux_out),
+        .regfile_load(WB_ctrl_out.regfile_load),
+        .ID_rd(WB_rd_out),
         .ID_ctrl_out,
         .rs1_out, 
         .rs2_out,
         .ID_inst_out
     );
-    assign regfile_in = WB_regfilemux_out; //TODO: Outputted from WB
+    
 
     ID_EX ID_EX(
         .clk,
@@ -140,7 +145,7 @@ module cpu(
         .alu_out,
         .IDEX_ctrl_out,
 		  .EX_u_imm_in(EX_u_imm_out),
-        .rd,
+        .rd_in(rd),
         .u_imm_out_EXMEM,
         .rd_out_EXMEM,
         .EXMEM_ctrl_out,
@@ -187,11 +192,13 @@ module cpu(
         .clk,
         .rst,
         .WB_u_imm_in(u_imm_out_MEMWB),
+		  .WB_rd_in(rd_out_EXMEM),
         .WB_ctrl_in(MEMWB_ctrl_out),
         .WB_alu_in(alu_out_MEMWB),
         .WB_mem_in(read_data_out_MEMWB), 
-
-        .WB_regfilemux_out
+		  .WB_ctrl_out,
+        .WB_regfilemux_out,
+		  .WB_rd_out
     );
 
 
