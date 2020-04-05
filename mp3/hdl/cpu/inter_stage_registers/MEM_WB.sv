@@ -8,11 +8,13 @@ module MEM_WB(
     input logic [4:0] MEMWB_rd_in,
     input rv32i_word alu_out_EXMEM,
     input rv32i_control_word MEM_ctrl_out,
+    input rv32i_word MEMWB_pc_in,
     output rv32i_word read_data_out_MEMWB,
     output rv32i_word u_imm_out_MEMWB,
     output logic [4:0] rd_out_MEMWB,
     output rv32i_word alu_out_MEMWB,
-    output rv32i_control_word MEMWB_ctrl_out
+    output rv32i_control_word MEMWB_ctrl_out,
+    output rv32i_word MEMWB_pc_out
 );
 
 register alu_MEMWB(
@@ -55,6 +57,13 @@ register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
     .out(MEMWB_ctrl_out)
 );
 
+register pc_MEMWB(
+    .clk,
+    .rst,
+    .load(1'b1),
+    .in(MEMWB_pc_in),
+    .out(MEMWB_pc_out)
+);
 
 
 endmodule : MEM_WB

@@ -8,11 +8,13 @@ module EX_MEM(
     input rv32i_word IDEX_ctrl_out,
     input logic [4:0] rd_in,
     input rv32i_word EX_u_imm_in,
+    input rv32i_word EXMEM_pc_in,
     output logic [4:0] rd_out_EXMEM,
     output rv32i_control_word EXMEM_ctrl_out,
     output rv32i_word alu_out_EXMEM,
     output rv32i_word rs2_out_EXMEM,
-    output rv32i_word u_imm_out_EXMEM
+    output rv32i_word u_imm_out_EXMEM,
+    output rv32i_word EXMEM_pc_out
 );
 
 register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
@@ -53,6 +55,14 @@ register u_imm_EXMEM(
     .load(1'b1),
     .in(EX_u_imm_in),
     .out(u_imm_out_EXMEM)
+);
+
+register pc_EXMEM(
+    .clk,
+    .rst,
+    .load(1'b1),
+    .in(EXMEM_pc_in),
+    .out(EXMEM_pc_out)
 );
 
 endmodule : EX_MEM

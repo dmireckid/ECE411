@@ -14,8 +14,9 @@ module EX(
     output rv32i_control_word EX_ctrl_out,
     output logic [4:0] rd,
     output [31:0] EX_u_imm_out,
-	 output rv32i_word EX_alu_mod2,
-	 output pcmux::pcmux_sel_t pcmux_sel
+	output rv32i_word EX_alu_mod2,
+	output pcmux::pcmux_sel_t pcmux_sel,
+    output rv32i_word EX_pc_out
 );
 
 
@@ -43,6 +44,7 @@ assign EX_ctrl_out = EX_ctrl_in;
 
 assign EX_u_imm_out = u_imm;
 assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
+assign EX_pc_out = pc_in;
 
 
 cmp cmp(
