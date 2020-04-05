@@ -5,11 +5,11 @@ module IF(
     input rst,
     input pcmux::pcmux_sel_t pcmux_sel,
     input rv32i_word pc_imm,
-	 input rv32i_word pc_alu_mod2,
+	input rv32i_word pc_alu_mod2,
     //input logic pc_load,
     output rv32i_word pc_out,
-	 output logic [31:0] inst_addr,
-	 output logic inst_read
+	output logic [31:0] inst_addr,
+	output logic inst_read
 );
 
 rv32i_word pcmux_out;
