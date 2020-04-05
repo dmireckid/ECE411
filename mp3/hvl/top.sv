@@ -87,7 +87,8 @@ assign regfile_load = dut.cpu.ID.regfile_load;
 logic [4:0] regfile_dest;
 assign regfile_dest = dut.cpu.ID.ID_rd;
 
-
+logic [31:0] alu_mod2;
+assign alu_mod2 = dut.cpu.IF.pc_alu_mod2;
 
 
 /*

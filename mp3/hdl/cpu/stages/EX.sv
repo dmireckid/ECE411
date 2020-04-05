@@ -43,8 +43,17 @@ assign rd = inst[11:7];
 assign EX_ctrl_out = EX_ctrl_in;
 
 assign EX_u_imm_out = u_imm;
-assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
+//assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
 assign EX_pc_out = pc_in;
+
+always_comb begin
+	if(EX_ctrl_out.opcode == op_jalr) begin
+		pcmux_sel = EX_ctrl_out.pcmux_sel;
+	end
+	else begin
+		pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
+	end
+end
 
 
 cmp cmp(

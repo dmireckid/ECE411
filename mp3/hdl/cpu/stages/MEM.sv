@@ -18,7 +18,7 @@ module MEM(
     output logic [31:0] MEM_data_read,
     output rv32i_word MEM_alu_out,
     output rv32i_control_word MEM_ctrl_out,
-	output logic [4:0] MEM_rd_out
+	output logic [4:0] MEM_rd_out,
     output rv32i_word MEM_pc_out
 );
 

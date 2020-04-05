@@ -73,7 +73,7 @@ module cpu(
 	rv32i_word regfile_in;
 	rv32i_control_word WB_ctrl_out;
 	logic [4:0] WB_rd_out;
-    rv32i_word MEM_pc_in;
+    rv32i_word WB_pc_in;
 
     IF IF(
         .clk,
@@ -157,7 +157,7 @@ module cpu(
         .rd_out_EXMEM,
         .EXMEM_ctrl_out,
         .alu_out_EXMEM,
-        .rs2_out_EXMEM
+        .rs2_out_EXMEM,
         .EXMEM_pc_in(EX_pc_out),
         .EXMEM_pc_out
     );
