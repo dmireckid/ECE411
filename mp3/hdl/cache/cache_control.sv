@@ -34,7 +34,7 @@ module cache_control (
 );
 
 //Internal Control Signals
-logic clean_miss, dirty_miss, resp;
+logic clean_miss, dirty_miss, resp, read_or_write;
 logic [31:0] tag_address;
 
 //Interal Assignments
