@@ -27,7 +27,14 @@ always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modif
 
 /********************* Assign Shadow Memory Signals Here *********************/
 // This section not required until CP2
+
+
+
 /*********************** End Shadow Memory Assignments ***********************/
+/*always @(posedge itf.clk) begin
+    if (rvfi.halt)
+        $finish;
+end*/
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
@@ -104,15 +111,12 @@ assign itf.halt = dut.load_pc & (dut.datapath.pc_out == dut.datapath.pcmux_out);
 mp3 dut(
     .clk(itf.clk),
     .rst(itf.rst),
-    .inst_rdata(itf.inst_rdata),
-    .data_rdata(itf.data_rdata),
-    .inst_read(itf.inst_read),
-    .inst_addr(itf.inst_addr),
-    .data_read(itf.data_read),
-    .data_write(itf.data_write),
-    .data_addr(itf.data_addr),
-    .data_mbe(itf.data_mbe),
-    .data_wdata(itf.data_wdata)
+    .mem_read(itf.mem_read);
+    .mem_write(itf.mem_write);
+    .mem_addr(itf.mem_addr);
+    .mem_wdata(itf.mem_wdata);
+    .mem_resp(itf.mem_resp);
+    .mem_rdata(itf.mem_rdata);
 );
 /***************************** End Instantiation *****************************/
 

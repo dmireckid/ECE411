@@ -6,17 +6,36 @@ module arbiter(
     input logic [255:0] arb_mem_data_in,
     input logic mem_to_arb_resp,
     output logic arb_to_mem_request,
-    output logic arb_to_cache_resp,
-    output logic [255:0] arb_mem_data_out
-    //add address and r/w signals?
+    output logic arb_to_icache_resp,
+    output logic arb_to_dcache_resp,
+
+    //icache <--> arbiter
+    input logic icache_read,
+    output logic [255:0] icache_data,
+    
+    input logic [31:0] icache_addr,
+    
+
+    //dcache <--> arbiter
+    input logic dcache_read,
+    input logic dcache_write,
+    input logic [255:0] dcache_wdata,
+    output logic [255:0] dcache_rdata,
+    
+    //arbiter <--> cacheline_adapter
+    
 );
 
-logic [255:0] queue[$];
+logic dcache_request;
+assign dcache_request = dcache_read || dcache_write;
+
+
 
 enum int unsigned {
     /* List of states */
     idle,
-    active
+    instruction,
+    data
 } state, next_states;
 
 always_comb
@@ -30,13 +49,15 @@ begin : state_actions
             begin
             if(cache_to_arb_request) queue.push_back(arb_mem_data_in);
             end
-        active:
+        instruction:
             begin
             if(mem_to_arb_resp) begin 
                 queue.pop_front();
                 arb_to_cache_resp = 1'b1;
             end
             end
+        
+        data:
     endcase
 end
 
