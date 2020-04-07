@@ -17,7 +17,7 @@ source_tb tb(
 /****************************** End do not touch *****************************/
 
 /************************ Signals necessary for monitor **********************/
-// This section not required until CP3
+// This section not required until CP3F
 
 assign rvfi.commit = 0; // Set high when a valid instruction is modifying regfile or PC
 assign rvfi.halt = 0;   // Set high when you detect an infinite loop
@@ -28,8 +28,22 @@ always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modif
 /********************* Assign Shadow Memory Signals Here *********************/
 // This section not required until CP2
 
+//shadow memory input
+assign itf.inst_read = dut.cpu.inst_read;
+assign itf.inst_addr = dut.cpu.inst_addr; 
+assign itf.inst_rdata= dut.cpu.inst_rdata;
+assign itf.inst_resp = dut.cpu.inst_resp;
+assign itf.data_read = dut.cpu.data_read;
+assign itf.data_write= dut.cpu.data_write;
+assign itf.data_addr = dut.cpu.data_addr;
+assign itf.data_rdata= dut.cpu.data_rdata;
+assign itf.data_wdata= dut.cpu.data_wdata;
+assign itf.data_resp = dut.cpu.data_resp;
+assign itf.data_mbe  = dut.cpu.data_mbe;
 
-
+//shadow memory output
+//inst_sm_error;
+//data_sm_error;
 /*********************** End Shadow Memory Assignments ***********************/
 /*always @(posedge itf.clk) begin
     if (rvfi.halt)
@@ -40,25 +54,25 @@ end*/
 assign itf.registers = dut.cpu.ID.regfile.data;
 //assign rvfi.halt = 1'b1 & (dut.cpu.pc_out == dut.cpu.IF.pcmux_out);
 
-bit clk;
+//bit clk;
 //bit rst;
 /* I Cache Ports */
-logic inst_read;
+//logic inst_read;
 //logic [31:0] inst_addr;
 //logic inst_resp;
-logic [31:0] inst_rdata;
+//logic [31:0] inst_rdata;
 
 /* D Cache Ports */
-logic data_read;
-logic data_write;
+//logic data_read;
+//logic data_write;
 //logic [3:0] data_mbe;
 //logic [31:0] data_addr;
-logic [31:0] data_wdata;
+//logic [31:0] data_wdata;
 //logic data_resp;
-logic [31:0] data_rdata;
+//ogic [31:0] data_rdata;
 
 
-
+/*
 assign clk = itf.clk;
 //assign rst = itf.rst;
 assign inst_addr = itf.inst_addr;
@@ -95,7 +109,7 @@ logic [4:0] regfile_dest;
 assign regfile_dest = dut.cpu.ID.ID_rd;
 
 logic [31:0] alu_mod2;
-assign alu_mod2 = dut.cpu.IF.pc_alu_mod2;
+assign alu_mod2 = dut.cpu.IF.pc_alu_mod2;*/
 
 
 /*
@@ -111,12 +125,12 @@ assign itf.halt = dut.load_pc & (dut.datapath.pc_out == dut.datapath.pcmux_out);
 mp3 dut(
     .clk(itf.clk),
     .rst(itf.rst),
-    .mem_read(itf.mem_read);
-    .mem_write(itf.mem_write);
-    .mem_addr(itf.mem_addr);
-    .mem_wdata(itf.mem_wdata);
-    .mem_resp(itf.mem_resp);
-    .mem_rdata(itf.mem_rdata);
+    .mem_read(itf.mem_read),
+    .mem_write(itf.mem_write),
+    .mem_addr(itf.mem_addr),
+    .mem_wdata(itf.mem_wdata),
+    .mem_resp(itf.mem_resp),
+    .mem_rdata(itf.mem_rdata)
 );
 /***************************** End Instantiation *****************************/
 

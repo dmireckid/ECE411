@@ -1,35 +1,44 @@
 module arbiter(
     input logic clk,
     input logic rst,
-    input logic cache_id,
-    input logic cache_to_arb_request,
-    input logic [255:0] arb_mem_data_in,
-    input logic mem_to_arb_resp,
-    output logic arb_to_mem_request,
-    output logic arb_to_icache_resp,
-    output logic arb_to_dcache_resp,
 
     //icache <--> arbiter
     input logic icache_read,
     output logic [255:0] icache_data,
-    
     input logic [31:0] icache_addr,
-    
+    output logic icache_resp,
 
     //dcache <--> arbiter
     input logic dcache_read,
     input logic dcache_write,
     input logic [255:0] dcache_wdata,
     output logic [255:0] dcache_rdata,
-    
+    input logic [31:0] dcache_addr,
+    output logic dcache_resp,
+
     //arbiter <--> cacheline_adapter
-    
+    input arbiter_resp,
+    output logic [31:0] arb_mem_address,
+    output arb_mem_read,
+    output arb_mem_write,
+    input logic [255:0] arb_mem_rdata,
+    output logic [255:0] arb_mem_wdata
+
 );
 
 logic dcache_request;
 assign dcache_request = dcache_read || dcache_write;
 
-
+function void set_defaults();
+	icache_data = 256'b0;
+    icache_resp = 1'b0;
+    dcache_rdata = 256'b0;
+    dcache_resp = 1'b0;
+    arb_mem_address = 32'b0;
+    arb_mem_read = 1'b0;
+    arb_mem_write = 1'b0;
+    arb_mem_wdata = 256'b0;
+endfunction
 
 enum int unsigned {
     /* List of states */
@@ -40,24 +49,36 @@ enum int unsigned {
 
 always_comb
 begin : state_actions
-    /* Default output assignments */
-    arb_to_mem_resp = 1'b0;
-    arb_to_cache_resp = 1'b0;
     /* Actions for each state */
+    set_defaults();
     unique case (state)
-        idle:
-            begin
-            if(cache_to_arb_request) queue.push_back(arb_mem_data_in);
-            end
-        instruction:
-            begin
-            if(mem_to_arb_resp) begin 
-                queue.pop_front();
-                arb_to_cache_resp = 1'b1;
-            end
-            end
+        idle: ;
         
+        instruction:
+        begin    
+            arb_mem_address = icache_addr;
+            icache_resp = arbiter_resp;
+            arb_mem_read = icache_read;
+            arb_mem_write = 1'b0;
+            icache_data = arb_mem_rdata;
+        end
         data:
+        begin
+            if (dcache_read == 1'd1) begin
+                arb_mem_address = dcache_addr;
+                dcache_resp = arbiter_resp;
+                arb_mem_read = dcache_read;
+                arb_mem_write = dcache_read;
+                dcache_rdata = arb_mem_rdata;
+            end
+            else if (dcache_write == 1'd1) begin
+                arb_mem_address = dcache_addr;
+                dcache_resp = arbiter_resp;
+                arb_mem_write = dcache_write;
+                arb_mem_read = dcache_read;
+                arb_mem_wdata = dcache_wdata;
+            end
+        end
     endcase
 end
 
@@ -67,12 +88,22 @@ begin : next_state_logic
      * for transitioning between states */
     next_states = state;
     unique case (state)
-        idle: if (cache_to_arb_request) next_states = request;
-        active: begin
-            if(arb_to_cache_resp == 1'b1) begin
-                if (queue.size() == 0) next_states = idle;
+        idle:
+            begin
+            if(dcache_request) next_states = data;
+            else if(icache_read) next_states = instruction;
+            else next_states = idle;
             end
-        end
+        instruction:
+            begin
+            if(arbiter_resp) next_states = idle;
+            else next_states = instruction;
+            end
+        data:
+            begin
+            if(arbiter_resp) next_states = idle;
+            else next_states = data;
+            end
     endcase
 end
 

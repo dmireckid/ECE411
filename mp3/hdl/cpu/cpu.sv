@@ -3,12 +3,13 @@ import rv32i_types::*;
 module cpu(
     input clk,
     input rst,
-    input [31:0] inst_rdata,
-	 input [31:0] data_rdata,
+    input logic [31:0] inst_rdata,
+	input logic [31:0] data_rdata,
+    input logic inst_resp,
+    input logic data_resp,
 
-
-    output inst_read,
-    output [31:0] inst_addr,
+    output logic inst_read,
+    output logic [31:0] inst_addr,
     output logic data_read,
     output logic data_write,
     output logic [3:0] data_mbe,

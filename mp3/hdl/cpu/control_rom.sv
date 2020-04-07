@@ -83,35 +83,6 @@ begin
             //sb sh sw?
         end
 
-
-        /*
-        st1: begin
-				mem_write = 1'b1;
-				unique case (store_funct3)
-						sb: begin
-								case (mem_address[1:0])
-										2'b00: mem_byte_enable = 4'b0001;
-										2'b01: mem_byte_enable = 4'b0010;
-										2'b10: mem_byte_enable = 4'b0100;
-										2'b11: mem_byte_enable = 4'b1000;
-								endcase
-							 end
-						sh: begin
-								case (mem_address[1])
-										1'b0: mem_byte_enable = 4'b0011;
-										1'b1: mem_byte_enable = 4'b1100;
-								endcase
-							 end
-						sw: mem_byte_enable = 4'b1111;
-				endcase
-			end
-
-
-
-        */
-
-
-
         op_imm: begin
             ctrl.regfile_load = 1;
             case (arith_funct3_t'(funct3))
@@ -246,8 +217,7 @@ begin
             ctrl.pcmux_sel = pcmux::alu_mod2;
             //ctrl.aluop = alu_add;
         end
-        /* ... other opcodes ... */
-
+        
         default: begin
             ctrl = 0;   /* Unknown opcode, set control word to zero */
         end
