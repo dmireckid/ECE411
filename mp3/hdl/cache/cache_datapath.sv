@@ -78,7 +78,7 @@ assign mem_rdata256 = data;
 assign pmem_wdata = data;
 assign write_en_mux0 = data_write && hit0 || !lru && datain_mux;
 assign write_en_mux1 = data_write && hit1 || lru && datain_mux;
-assign dataout_mux0 = hit0
+assign dataout_mux0 = hit0;
 assign dataout_mux1 = hit1;
 
 //Tag/Hit
@@ -193,15 +193,16 @@ always_comb begin : MUXES
 			1'b0: datain_mux_out = mem_wdata256;
 			
 			1'b1: datain_mux_out = pmem_rdata;
+			default: datain_mux_out = mem_wdata256;
 	endcase
 	
 	//dataout mux
 	unique case ({dataout_mux0, dataout_mux1})
 			2'b00: data = 256'b0;
 			
-			2'b01: data = data0;
+			2'b01: data = data1;
 			
-			2'b10: data = data1;
+			2'b10: data = data0;
 			
 			default: data = 256'b0;
 	endcase
@@ -211,6 +212,8 @@ always_comb begin : MUXES
 			1'b0: tag_out = tag0;
 			
 			1'b1: tag_out = tag1;
+
+			default: tag_out = tag0;
 	endcase
 	
 	//dirty load mux
@@ -224,12 +227,18 @@ always_comb begin : MUXES
 				dirty_mux_out0 = !lru;
 				dirty_mux_out1 = lru;
 			end
+
+			default: begin
+				dirty_mux_out0 = hit0;
+				dirty_mux_out1 = hit1;
+			end
 	endcase
 	
 	//dirty out mux
 	unique case (lru)
 			1'b0: dirty = dirty0;
 			1'b1: dirty = dirty1;
+			default: dirty = dirty0;
 	endcase
 end
 

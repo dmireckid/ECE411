@@ -14,7 +14,7 @@ _start:
     nop
     nop
     nop
-	sb x1, 0(x2)
+	sw x1, 0(x2)
 	nop
     nop
     nop
