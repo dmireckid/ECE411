@@ -91,7 +91,7 @@ begin : state_actions
 				mem_resp = resp;
 			end
 			
-			write_miss: begin
+			write_back: begin
 				dirty_read = 1'b1;
 				dirty_load = 1'b1;
 				dirty_mux = 1'b1;
@@ -100,7 +100,7 @@ begin : state_actions
 				pmem_address = tag_address;
 			end
 			
-			read_miss: begin
+			allocate: begin
 				valid_load = 1'b1;
 				datain_mux = pmem_resp;
 				pmem_read = 1'b1;
@@ -117,7 +117,7 @@ begin : next_state_logic
 	 next_states = state;
 	 unique case (state)
 			idle_compare: begin
-				if (dirty_miss) next_states = write_back
+				if (dirty_miss) next_states = write_back;
 				else if (clean_miss) next_states = allocate;
 				else next_states = idle_compare;
 			end

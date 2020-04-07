@@ -3,42 +3,37 @@ import rv32i_types::*;
 module mp3(
     input clk,
     input rst,
-    output logic mem_read;
-    output logic mem_write;
-    output logic [31:0] mem_addr;
-    output logic [63:0] mem_wdata;
-    input logic mem_resp;
-    input logic [63:0] mem_rdata;
+    output logic mem_read,
+    output logic mem_write,
+    output logic [31:0] mem_addr,
+    output logic [63:0] mem_wdata,
+    input logic mem_resp,
+    input logic [63:0] mem_rdata
 );
 
 /***********arbiter signals************/
 
-logic arbiter_resp, arb_mem_read, arb_mem_write;
-logic [31:0] arb_mem_address;
-logic [255:0] arb_mem_rdata,
-logic [255:0] arb_mem_wdata  
-
 //icache <--> arbiter
-logic icache_read,
-logic [255:0] icache_data,
-logic [31:0] icache_addr,
-logic icache_resp,
+logic icache_read;
+logic [255:0] icache_data;
+logic [31:0] icache_addr;
+logic icache_resp;
 
 //dcache <--> arbiter
-logic dcache_read,
-logic dcache_write,
-logic [255:0] dcache_wdata,
-logic [255:0] dcache_rdata,
-logic [31:0] dcache_addr,
-logic dcache_resp,
+logic dcache_read;
+logic dcache_write;
+logic [255:0] dcache_wdata;
+logic [255:0] dcache_rdata;
+logic [31:0] dcache_addr;
+logic dcache_resp;
 
 //arbiter <--> cacheline_adapter
-logic arbiter_resp
-logic [31:0] arb_mem_address,
-logic arb_mem_read,
-logic arb_mem_write,
-logic [255:0] arb_mem_rdata,
-logic [255:0] arb_mem_wdata  
+logic arbiter_resp;
+logic [31:0] arb_mem_address;
+logic arb_mem_read;
+logic arb_mem_write;
+logic [255:0] arb_mem_rdata;
+logic [255:0] arb_mem_wdata; 
 
 /********end arbiter signals************/
 
@@ -88,18 +83,18 @@ cache icache (
 	//CPU Datapath <--> Cache
 	.mem_address(icache_mem_address),
 	.mem_rdata(icache_mem_rdata),
-	.mem_wdata(256'b0),
+	.mem_wdata(),
 	.mem_read(icache_mem_read),
-	.mem_write(1'b0),
-	.mem_byte_enable(4'b1111),
+	.mem_write(),
+	.mem_byte_enable(),
 	.mem_resp(icache_mem_resp),
 	
 	//Cache <--> Arbiter
-	.mem_address(icache_addr),
+	.pmem_address(icache_addr),
 	.pmem_rdata(icache_data),
-	.pmem_wdata(256'b0),
+	.pmem_wdata(),
 	.pmem_read(icache_read),
-	.pmem_write(1'b0),
+	.pmem_write(),
 	.pmem_resp(icache_resp)
 );
 
@@ -144,7 +139,7 @@ arbiter arbiter (
     .dcache_resp,
 
     //arbiter <--> cacheline_adapter
-    .arbiter_resp
+    .arbiter_resp,
     .arb_mem_address,
     .arb_mem_read,
     .arb_mem_write,

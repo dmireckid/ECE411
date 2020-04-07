@@ -6,7 +6,7 @@ module IF(
     input pcmux::pcmux_sel_t pcmux_sel,
     input rv32i_word pc_imm,
 	input rv32i_word pc_alu_mod2,
-    //input logic pc_load,
+    input logic pc_load,
     output rv32i_word pc_out,
 	output logic [31:0] inst_addr,
 	output logic inst_read
@@ -20,7 +20,7 @@ assign inst_addr = pc_out;
 pc_register pc(
     .clk,
     .rst,
-    .load(1'b1),  // TODO: come back if error
+    .load(pc_load),  // TODO: come back if error
     .in(pcmux_out),
     .out(pc_out)
 );

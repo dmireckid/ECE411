@@ -82,7 +82,7 @@ module cpu(
         .pcmux_sel,
         .pc_imm(alu_out),
 		  .pc_alu_mod2(EX_alu_mod2),
-        //input logic pc_load,
+        .pc_load(inst_resp),
 		  .inst_read,
 		  .inst_addr,
         .pc_out

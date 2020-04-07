@@ -17,13 +17,12 @@ module arbiter(
     output logic dcache_resp,
 
     //arbiter <--> cacheline_adapter
-    input arbiter_resp,
+    input logic arbiter_resp,
     output logic [31:0] arb_mem_address,
-    output arb_mem_read,
-    output arb_mem_write,
+    output logic arb_mem_read,
+    output logic arb_mem_write,
     input logic [255:0] arb_mem_rdata,
     output logic [255:0] arb_mem_wdata
-
 );
 
 logic dcache_request;
@@ -62,6 +61,7 @@ begin : state_actions
             arb_mem_write = 1'b0;
             icache_data = arb_mem_rdata;
         end
+		  
         data:
         begin
             if (dcache_read == 1'd1) begin
@@ -94,11 +94,13 @@ begin : next_state_logic
             else if(icache_read) next_states = instruction;
             else next_states = idle;
             end
+				
         instruction:
             begin
             if(arbiter_resp) next_states = idle;
             else next_states = instruction;
             end
+				
         data:
             begin
             if(arbiter_resp) next_states = idle;
