@@ -1,7 +1,7 @@
 module cacheline_adaptor
 (
     input clk,
-    input reset_n,
+    input reset,
 
     // Port to LLC (Lowest Level Cache)
     input logic [255:0] line_i,
@@ -68,19 +68,19 @@ begin : state_actions
     unique case (state)
             read_or_write: begin
                 address = 32'b0;
-				burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst1_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
                 burst_o = 64'b0;
             end
 
             read_begin: begin
-                burst_o = 64'b0;
-				burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst1_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 burst_o = 64'b0;
                 address = address_i;
                 read_o = 1'b1;
             end
@@ -89,9 +89,10 @@ begin : state_actions
                 address = ta;
                 burst1_o = burst_i;
                 burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
                 burst_o = 64'b0;
+					 read_o = 1'b1;
             end
 
             read2: begin
@@ -99,8 +100,9 @@ begin : state_actions
                 burst2_o = burst_i;
                 burst1_o = tb1;
                 burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst4_o = 64'b0;
                 burst_o = 64'b0;
+					 read_o = 1'b1;
             end
 
             read3: begin
@@ -108,8 +110,9 @@ begin : state_actions
                 burst3_o = burst_i;
                 burst1_o = tb1;
                 burst2_o = tb2;
-				burst4_o = 64'b0;
+					 burst4_o = 64'b0;
                 burst_o = 64'b0;
+					 read_o = 1'b1;
             end
 
             read4: begin
@@ -119,6 +122,7 @@ begin : state_actions
                 burst2_o = tb2;
                 burst3_o = tb3;
                 burst_o = 64'b0;
+					 read_o = 1'b1;
             end
 
             read_finish: begin
@@ -128,6 +132,7 @@ begin : state_actions
                 burst3_o = tb3;
                 burst4_o = tb4;
                 burst_o = 64'b0;
+					 read_o = 1'b0;
                 if(resp_i == 1'b0) begin
                     resp_o = 1'b1;
                 end
@@ -135,9 +140,9 @@ begin : state_actions
 
             write_begin: begin
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
                 burst_o = 64'b0;
                 address = address_i;
                 write_o = 1'b1;
@@ -147,45 +152,50 @@ begin : state_actions
                 address = ta;
                 burst_o = burst1_i;
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 write_o = 1'b1;
             end
 
             write2: begin
                 address = ta;
                 burst_o = burst2_i;
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 write_o = 1'b1;
             end
 
             write3: begin
                 address = ta;
                 burst_o = burst3_i;
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 write_o = 1'b1;
             end
 
             write4: begin
                 address = ta;
                 burst_o = burst4_i;
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 write_o = 1'b1;
             end
 
             write_finish: begin
                 address = ta;
                 burst1_o = 64'b0;
-				burst2_o = 64'b0;
-				burst3_o = 64'b0;
-				burst4_o = 64'b0;
-                burst_o = 64'b0;
+					 burst2_o = 64'b0;
+					 burst3_o = 64'b0;
+					 burst4_o = 64'b0;
+					 burst_o = 64'b0;
+					 write_o = 1'b0;
                 if(resp_i == 1'b0) begin
                     resp_o = 1'b1;
                 end
@@ -230,7 +240,7 @@ end
 
 always_ff @ (posedge clk) 
 begin : next_state_assignment
-    if (~reset_n)
+    if (reset)
         state <= read_or_write;
     else
         state <= next_states;
