@@ -38,8 +38,8 @@ logic clean_miss, dirty_miss, resp, read_or_write;
 logic [31:0] tag_address;
 
 //Interal Assignments
-assign clean_miss = !hit && !dirty;
-assign dirty_miss = !hit && dirty; 
+assign clean_miss = !hit && !dirty && read_or_write;
+assign dirty_miss = !hit && dirty && read_or_write; 
 assign read_or_write = (mem_read || mem_write);
 assign resp = hit && read_or_write;
 assign tag_address = {tag_out, mem_address[7:0]};

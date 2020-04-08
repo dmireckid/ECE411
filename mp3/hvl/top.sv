@@ -41,6 +41,18 @@ assign itf.data_wdata= dut.cpu.data_wdata;
 assign itf.data_resp = dut.cpu.data_resp;
 assign itf.data_mbe  = dut.cpu.data_mbe;
 
+// assign dut.cpu.inst_read = itf.inst_read;
+// assign dut.cpu.inst_addr = itf.inst_addr;
+// assign dut.cpu.inst_rdata = itf.inst_rdata;
+// assign dut.cpu.inst_resp = itf.inst_resp;
+// assign dut.cpu.data_read = itf.data_read;
+// assign dut.cpu.data_write = itf.data_write;
+// assign dut.cpu.data_addr = itf.data_addr;
+// assign dut.cpu.data_rdata = itf.data_rdata;
+// assign dut.cpu.data_wdata = itf.data_wdata;
+// assign dut.cpu.data_resp = dut.cpu.data_resp;
+// assign itf.data_mbe = dut.cpu.data_mbe;
+
 //shadow memory output
 //inst_sm_error;
 //data_sm_error;
