@@ -44,6 +44,7 @@ logic [31:0] icache_mem_address;
 logic [31:0] icache_mem_rdata;
 logic icache_mem_read;
 logic icache_mem_resp;
+logic icache_hit;
 	
 /*********end icache signals********/
 
@@ -57,6 +58,7 @@ logic dcache_mem_read;
 logic dcache_mem_write;
 logic [3:0] dcache_mem_byte_enable;
 logic dcache_mem_resp;
+logic dcache_hit;
 
 /**********end dcache signals********/
 
@@ -73,7 +75,9 @@ cpu cpu(
     .data_write(dcache_mem_write),
     .data_mbe(dcache_mem_byte_enable),
     .data_addr(dcache_mem_address),
-    .data_wdata(dcache_mem_wdata)
+    .data_wdata(dcache_mem_wdata),
+	 .icache_hit,
+	 .dcache_hit
 );
 
 cache icache (
@@ -88,6 +92,7 @@ cache icache (
 	.mem_write(),
 	.mem_byte_enable(),
 	.mem_resp(icache_mem_resp),
+	.cache_hit(icache_hit),
 	
 	//Cache <--> Arbiter
 	.pmem_address(icache_addr),
@@ -110,6 +115,7 @@ cache dcache (
 	.mem_write(dcache_mem_write),
 	.mem_byte_enable(dcache_mem_byte_enable),
 	.mem_resp(dcache_mem_resp),
+	.cache_hit(dcache_hit),
 	
 	//Cache <--> Arbiter
 	.pmem_address(dcache_addr),

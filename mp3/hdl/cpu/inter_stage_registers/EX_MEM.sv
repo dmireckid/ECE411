@@ -9,6 +9,7 @@ module EX_MEM(
     input logic [4:0] rd_in,
     input rv32i_word EX_u_imm_in,
     input rv32i_word EXMEM_pc_in,
+	 input logic stall,
     output logic [4:0] rd_out_EXMEM,
     output rv32i_control_word EXMEM_ctrl_out,
     output rv32i_word alu_out_EXMEM,
@@ -20,7 +21,7 @@ module EX_MEM(
 register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(IDEX_ctrl_out),
     .out(EXMEM_ctrl_out)
 );
@@ -28,7 +29,7 @@ register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
 register alu_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(alu_out),
     .out(alu_out_EXMEM)
 );
@@ -36,7 +37,7 @@ register alu_EXMEM(
 register rs2_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(rs2_out_IDEX),
     .out(rs2_out_EXMEM)
 );
@@ -44,7 +45,7 @@ register rs2_EXMEM(
 register #(.width(5)) rd_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(rd_in),
     .out(rd_out_EXMEM)
 );
@@ -52,7 +53,7 @@ register #(.width(5)) rd_EXMEM(
 register u_imm_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(EX_u_imm_in),
     .out(u_imm_out_EXMEM)
 );
@@ -60,7 +61,7 @@ register u_imm_EXMEM(
 register pc_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(EXMEM_pc_in),
     .out(EXMEM_pc_out)
 );

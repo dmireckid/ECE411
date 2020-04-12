@@ -18,6 +18,7 @@ module cache #(
 	input logic mem_write,
 	input logic [3:0] mem_byte_enable,
 	output logic mem_resp,
+	output logic cache_hit,
 	
 	//Cache <--> Cacheline Adaptor/Main Memory
 	output logic [31:0] pmem_address,
@@ -37,6 +38,8 @@ logic [31:0] mem_byte_enable256;
 logic data_read, data_write, datain_mux, tag_read, tag_load, valid_load, valid_read, 
 		dirty_in, dirty_mux, dirty_read, dirty_load, dirty, lru_load, lru_read, hit;
 logic [23:0] tag_out;
+
+assign cache_hit = hit;
 
 
 

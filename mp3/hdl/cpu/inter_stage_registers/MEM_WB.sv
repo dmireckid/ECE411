@@ -9,6 +9,7 @@ module MEM_WB(
     input rv32i_word alu_out_EXMEM,
     input rv32i_control_word MEM_ctrl_out,
     input rv32i_word MEMWB_pc_in,
+	 input logic stall,
     output rv32i_word read_data_out_MEMWB,
     output rv32i_word u_imm_out_MEMWB,
     output logic [4:0] rd_out_MEMWB,
@@ -20,7 +21,7 @@ module MEM_WB(
 register alu_MEMWB(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(alu_out_EXMEM),
     .out(alu_out_MEMWB)
 );
@@ -28,7 +29,7 @@ register alu_MEMWB(
 register u_imm_MEMWB(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(u_imm_out_EXMEM),
     .out(u_imm_out_MEMWB)
 );
@@ -36,7 +37,7 @@ register u_imm_MEMWB(
 register rdata_MEMWB(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(read_data),
     .out(read_data_out_MEMWB)
 );
@@ -44,7 +45,7 @@ register rdata_MEMWB(
 register #(.width(5)) rd_MEMWB(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(MEMWB_rd_in),
     .out(rd_out_MEMWB)
 );
@@ -52,7 +53,7 @@ register #(.width(5)) rd_MEMWB(
 register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(MEM_ctrl_out),
     .out(MEMWB_ctrl_out)
 );
@@ -60,7 +61,7 @@ register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
 register pc_MEMWB(
     .clk,
     .rst,
-    .load(1'b1),
+    .load(stall),
     .in(MEMWB_pc_in),
     .out(MEMWB_pc_out)
 );

@@ -20,7 +20,7 @@ assign inst_addr = pc_out;
 pc_register pc(
     .clk,
     .rst,
-    .load(1'b1),  // TODO: come back if error
+    .load(pc_load),  // TODO: come back if error
     .in(pcmux_out),
     .out(pc_out)
 );

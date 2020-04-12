@@ -65,6 +65,7 @@ begin
                 lbu: ctrl.regfilemux_sel = regfilemux::lbu;
                 lhu: ctrl.regfilemux_sel = regfilemux::lhu;
                 lw: ctrl.regfilemux_sel = regfilemux::lw;
+					 default: ctrl.regfilemux_sel = regfilemux::lw;
             endcase
         end
 
