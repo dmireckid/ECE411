@@ -68,7 +68,7 @@ begin : state_actions
                 arb_mem_address = dcache_addr;
                 dcache_resp = arbiter_resp;
                 arb_mem_read = dcache_read;
-                arb_mem_write = dcache_read;
+                arb_mem_write = dcache_write;
                 dcache_rdata = arb_mem_rdata;
             end
             else if (dcache_write == 1'd1) begin

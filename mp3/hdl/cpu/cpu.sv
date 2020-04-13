@@ -79,7 +79,7 @@ module cpu(
     rv32i_word WB_pc_in;
 	 
 	 logic stall;
-	 assign stall = icache_hit && dcache_hit;
+	 assign stall = (inst_read && !inst_resp) || (data_read && !data_resp) || (data_write && !data_resp);
 
     IF IF(
         .clk,
@@ -87,7 +87,7 @@ module cpu(
         .pcmux_sel,
         .pc_imm(alu_out),
 		  .pc_alu_mod2(EX_alu_mod2),
-        .pc_load(stall),
+        .pc_load(!stall && inst_resp),
 		  .inst_read,
 		  .inst_addr,
         .pc_out
@@ -101,7 +101,7 @@ module cpu(
         .inst_rdata,
         .pc_out_IFID,
         .inst_out_IFID,
-		  .stall
+		  .stall(!stall)
     );
 
     ID ID(
@@ -131,7 +131,7 @@ module cpu(
         .inst_out_IDEX,
 		.rs1_out_IDEX,
 		.rs2_out_IDEX,
-		.stall
+		.stall(!stall)
     );
 
     EX EX(
@@ -168,7 +168,7 @@ module cpu(
         .rs2_out_EXMEM,
         .EXMEM_pc_in(EX_pc_out),
         .EXMEM_pc_out,
-		  .stall
+		  .stall(!stall)
     );
  
     MEM MEM(
@@ -207,7 +207,7 @@ module cpu(
         .MEMWB_ctrl_out,
         .MEMWB_pc_in(MEM_pc_out),
         .MEMWB_pc_out,
-		  .stall
+		  .stall(!stall)
     );
 
 
