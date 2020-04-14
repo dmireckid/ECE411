@@ -42,7 +42,7 @@ initial begin
                 @(sm_itf.smcb iff (sm_itf.smcb.read_a && sm_itf.smcb.resp_a))
                 rdata_inst = read(sm_itf.smcb.address_a);
                 if (rdata_inst != sm_itf.smcb.rdata_a) begin
-                    $display("%0t: ShadowMemory Error: Mismatch rdata:", $time,
+                    $display("%0t: ShadowMemory Error: Mismatch inst_rdata:", $time,
                         " Expected %8h, Detected %8h", rdata_inst,
                         sm_itf.smcb.rdata_a);
                     errcount++;
@@ -64,7 +64,7 @@ initial begin
                 end
                 if (_read_data) begin
                     if (rdata_data != sm_itf.smcb.rdata_b) begin
-                        $display("%0t: ShadowMemory Error: Mismatch rdata:", $time,
+                        $display("%0t: ShadowMemory Error: Mismatch data_rdata:", $time,
                             " Expected %8h, Detected %8h", rdata_data,
                             sm_itf.smcb.rdata_b);
                         errcount++;

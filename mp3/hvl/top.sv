@@ -20,7 +20,7 @@ source_tb tb(
 // This section not required until CP3F
 
 assign rvfi.commit = 0; // Set high when a valid instruction is modifying regfile or PC
-assign rvfi.halt = 0;   // Set high when you detect an infinite loop
+//assign rvfi.halt = 0;   // Set high when you detect an infinite loop
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
 /**************************** End RVFIMON signals ****************************/
@@ -41,30 +41,23 @@ assign itf.data_wdata= dut.cpu.data_wdata;
 assign itf.data_resp = dut.cpu.data_resp;
 assign itf.data_mbe  = dut.cpu.data_mbe;
 
-// assign dut.cpu.inst_read = itf.inst_read;
-// assign dut.cpu.inst_addr = itf.inst_addr;
-// assign dut.cpu.inst_rdata = itf.inst_rdata;
-// assign dut.cpu.inst_resp = itf.inst_resp;
-// assign dut.cpu.data_read = itf.data_read;
-// assign dut.cpu.data_write = itf.data_write;
-// assign dut.cpu.data_addr = itf.data_addr;
-// assign dut.cpu.data_rdata = itf.data_rdata;
-// assign dut.cpu.data_wdata = itf.data_wdata;
-// assign dut.cpu.data_resp = dut.cpu.data_resp;
-// assign itf.data_mbe = dut.cpu.data_mbe;
-
 //shadow memory output
 //inst_sm_error;
 //data_sm_error;
 /*********************** End Shadow Memory Assignments ***********************/
+//logic halt;
+//assign halt = dut.cpu.IF.pc_load & (dut.cpu.inst_addr == dut.cpu.data_addr);
+
+
+
 /*always @(posedge itf.clk) begin
-    if (rvfi.halt)
+    if (halt)
         $finish;
 end*/
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
-//assign rvfi.halt = 1'b1 & (dut.cpu.pc_out == dut.cpu.IF.pcmux_out);
+
 
 //bit clk;
 //bit rst;
@@ -130,6 +123,20 @@ assign itf.halt = dut.load_pc & (dut.datapath.pc_out == dut.datapath.pcmux_out);
 
 
 */
+
+
+// assign dut.cpu.inst_read = itf.inst_read;
+// assign dut.cpu.inst_addr = itf.inst_addr;
+// assign dut.cpu.inst_rdata = itf.inst_rdata;
+// assign dut.cpu.inst_resp = itf.inst_resp;
+// assign dut.cpu.data_read = itf.data_read;
+// assign dut.cpu.data_write = itf.data_write;
+// assign dut.cpu.data_addr = itf.data_addr;
+// assign dut.cpu.data_rdata = itf.data_rdata;
+// assign dut.cpu.data_wdata = itf.data_wdata;
+// assign dut.cpu.data_resp = dut.cpu.data_resp;
+// assign itf.data_mbe = dut.cpu.data_mbe;
+
 
 
 
