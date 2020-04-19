@@ -3,7 +3,7 @@
 .section .text
 .globl _start
 _start:
-	la x2, ONE
+	la x2, TEMP1
 	lw x1, %lo(BADD)(x0)
     nop
     nop

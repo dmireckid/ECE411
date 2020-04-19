@@ -20,6 +20,7 @@ module cache_datapath #(
 	//<--> Bus Adapter
 	input logic [255:0] mem_wdata256,
 	output logic [255:0] mem_rdata256,
+	input logic [31:0] mem_byte_enable256,
 	
 	//<--> Cache Control
 	input logic data_read,
@@ -78,9 +79,8 @@ assign mem_rdata256 = data;
 assign pmem_wdata = data;
 assign write_en_mux0 = data_write && hit0 || !lru && datain_mux;
 assign write_en_mux1 = data_write && hit1 || lru && datain_mux;
-assign dataout_mux0 = hit0;
+assign dataout_mux0 = hit0; 
 assign dataout_mux1 = hit1;
-
 //Tag/Hit
 assign tag_load0 = tag_load && !lru;
 assign tag_load1 = tag_load && lru;
@@ -173,13 +173,25 @@ always_comb begin : MUXES
 			end
 			
 			2'b01: begin
-				data_write_en0 = 32'b0;
-				data_write_en1 = 32'hFFFFFFFF;
+				if (lru && datain_mux) begin
+					data_write_en0 = 32'b0;
+					data_write_en1 = 32'hFFFFFFFF;
+				end
+				else begin
+					data_write_en0 = 32'b0;
+					data_write_en1 = mem_byte_enable256;
+				end
 			end
 			
 			2'b10: begin
-				data_write_en0 = 32'hFFFFFFFF;
-				data_write_en1 = 32'b0;
+				if (!lru && datain_mux) begin
+					data_write_en0 = 32'hFFFFFFFF;
+					data_write_en1 = 32'b0;
+				end
+				else begin
+					data_write_en0 = mem_byte_enable256;
+					data_write_en1 = 32'b0;
+				end
 			end
 			
 			default: begin
