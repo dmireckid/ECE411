@@ -70,6 +70,7 @@ begin : state_actions
                 arb_mem_read = dcache_read;
                 arb_mem_write = dcache_write;
                 dcache_rdata = arb_mem_rdata;
+					 arb_mem_wdata = dcache_wdata;
             end
             else if (dcache_write == 1'd1) begin
                 arb_mem_address = dcache_addr;
@@ -77,6 +78,7 @@ begin : state_actions
                 arb_mem_write = dcache_write;
                 arb_mem_read = dcache_read;
                 arb_mem_wdata = dcache_wdata;
+					 dcache_rdata = arb_mem_rdata;
             end
         end
     endcase

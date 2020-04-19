@@ -80,6 +80,15 @@ cpu cpu(
 	 .dcache_hit
 );
 
+
+logic [3:0] icache_mem_byte_enable;
+assign icache_mem_byte_enable = 4'b1111;
+logic icache_mem_write, icache_write;
+assign icache_mem_write = 1'b0;
+logic [31:0] icache_mem_wdata;
+assign icache_mem_wdata = 32'b0;
+logic [255:0] icache_wdata;
+
 cache icache (
     .clk,
 	.rst,
@@ -87,19 +96,19 @@ cache icache (
 	//CPU Datapath <--> Cache
 	.mem_address(icache_mem_address),
 	.mem_rdata(icache_mem_rdata),
-	.mem_wdata(),
+	.mem_wdata(icache_mem_wdata),
 	.mem_read(icache_mem_read),
-	.mem_write(),
-	.mem_byte_enable(),
+	.mem_write(icache_mem_write),
+	.mem_byte_enable(icache_mem_byte_enable),
 	.mem_resp(icache_mem_resp),
 	.cache_hit(icache_hit),
-	
+	    output logic [63:0] mem_wdata,
 	//Cache <--> Arbiter
 	.pmem_address(icache_addr),
 	.pmem_rdata(icache_data),
-	.pmem_wdata(),
+	.pmem_wdata(icache_wdata),
 	.pmem_read(icache_read),
-	.pmem_write(),
+	.pmem_write(icache_write),
 	.pmem_resp(icache_resp)
 );
 
