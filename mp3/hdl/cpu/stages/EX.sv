@@ -8,6 +8,10 @@ module EX(
     input rv32i_word rs2_in,
     input rv32i_control_word EX_ctrl_in,
     input rv32i_word pc_in,
+    input forwardingmux1_sel_t forward1,
+    input forwardingmux2_sel_t forward2,
+    input rv32i_word WB_regfile_in,
+    input rv32i_word alu_out_EXMEM,
 
     output rv32i_word EX_rs2_out,
     output rv32i_word alu_out,
@@ -25,6 +29,8 @@ rv32i_word alu_mux1_out;
 rv32i_word alu_mux2_out, alu_mod2;
 rv32i_word EX_rs1_in, EX_rs2_in;
 rv32i_word cmpmux_out;
+rv32i_word fwdmux1_out;
+rv32i_word fwdmux2_out;
 
 logic cmp_out;
 
@@ -80,7 +86,7 @@ assign EX_alu_mod2 = alu_mod2;
 
 always_comb begin: Muxes
     unique case (EX_ctrl_in.alumux1_sel) // alumux1
-        alumux::rs1_out: alu_mux1_out = EX_rs1_in;
+        alumux::rs1_out: alu_mux1_out = fwdmux1_out;
         alumux::pc_out : alu_mux1_out = pc_in;
 		  default: alu_mux1_out = EX_rs1_in;
     endcase
@@ -91,13 +97,24 @@ always_comb begin: Muxes
         alumux::b_imm : alu_mux2_out = b_imm;
         alumux::s_imm : alu_mux2_out = s_imm;
         alumux::j_imm : alu_mux2_out = j_imm;
-        alumux::rs2_out : alu_mux2_out = EX_rs2_in;
-		  default: alu_mux2_out = EX_rs2_in;
+        alumux::rs2_out : alu_mux2_out = fwdmux2_out;
+		  default: alu_mux2_out = fwdmux2_out;
     endcase
 
     unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
         cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
         cmpmux::i_imm    : cmpmux_out = i_imm;
+    endcase
+    
+    unique case (forward1) //forwarding mux1
+        forwarding::rs1 : fwdmux1_out = rs1_in;
+        forwarding::regfile_in : fwdmux1_out = WB_regfile_in;
+        forwarding::alu_out : fwdmux1_out = alu_out_EXMEM;
+    endcase
+    unique case (forward2) //forwarding mux1
+    forwarding::rs2 : fwdmux2_out = rs2_in;
+    forwarding::regfile_in : fwdmux2_out = WB_regfile_in;
+    forwarding::alu_out : fwdmux2_out = alu_out_EXMEM;
     endcase
 end
     

@@ -77,6 +77,10 @@ module cpu(
 	rv32i_control_word WB_ctrl_out;
 	logic [4:0] WB_rd_out;
     rv32i_word WB_pc_in;
+    
+    //Signals for Fwd Unit
+    forwardingmux1_sel_t forward1;
+    forwardingmux2_sel_t forward2;
 	 
 	 logic stall;
 	 assign stall = (inst_read && !inst_resp) || (data_read && !data_resp) || (data_write && !data_resp);
@@ -142,6 +146,10 @@ module cpu(
         .rs2_in(rs2_out_IDEX),
         .EX_ctrl_in(IDEX_ctrl_out),
         .pc_in(pc_out_IDEX),
+        .forward1,
+        .forward2,
+        .WB_regfile_in(WB_regfilemux_out),
+        .alu_out_EXMEM,
         .EX_rs2_out,
         .alu_out,
         .EX_ctrl_out,
@@ -225,5 +233,14 @@ module cpu(
         .WB_pc_in(MEMWB_pc_out)
     );
 
+    forwarding_unit forwarding_unit(
+        .rs1_in(rs1_out_IDEX),
+        .rs2_in(rs2_out_IDEX),
+        .EXMEM_rd(rd_out_EXMEM),
+        .MEMWB_rd(rd_out_MEMWB),
+        .forward1,
+        .forward2
+    );
+    
 
 endmodule : cpu
