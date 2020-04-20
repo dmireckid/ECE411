@@ -63,7 +63,7 @@ end
 
 
 cmp cmp(
-    .input1(fwdmux1_out),
+    .input1(EX_rs1_in),
 	.input2(cmpmux_out),
 	.cmpop(EX_ctrl_in.cmpop),
 	.br_en(cmp_out)
@@ -116,7 +116,7 @@ always_comb begin: Muxes
     endcase
 
     unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
-        cmpmux::rs2_out  : cmpmux_out = fwdmux2_out;
+        cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
         cmpmux::i_imm    : cmpmux_out = i_imm;
     endcase
 end

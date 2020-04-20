@@ -81,8 +81,8 @@ module cpu(
     //Signals for Fwd Unit
     logic [1:0] forward1;
     logic [1:0] forward2;
-	 assign forward1 = 2'b00;
-	 assign forward2 = 2'b00;
+	 //assign forward1 = 2'b00;
+	 //assign forward2 = 2'b00;
 	 
 	 logic stall;
 	 assign stall = (inst_read && !inst_resp) || (data_read && !data_resp) || (data_write && !data_resp);
@@ -235,7 +235,7 @@ module cpu(
         .WB_pc_in(MEMWB_pc_out)
     );
 
-	 /*
+	 
     forwarding_unit forwarding_unit(
         .rs1_in(rs1_out_IDEX),
         .rs2_in(rs2_out_IDEX),
@@ -243,7 +243,7 @@ module cpu(
         .MEMWB_rd(rd_out_MEMWB),
         .forward1,
         .forward2
-    );*/
+    );
     
 
 endmodule : cpu

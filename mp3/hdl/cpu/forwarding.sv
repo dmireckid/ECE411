@@ -12,12 +12,12 @@ module forwarding_unit
 
 always_comb
 begin
-    if(rs1_in == EXMEM_rd) forward1 = 2'b10;
-    else if(rs1_in == MEMWB_rd) forward1 = 2'b01;
+    if(rs1_in == EXMEM_rd && rs1_in != 0) forward1 = 2'b10;
+    else if(rs1_in == MEMWB_rd && EXMEM_rd != rs1_in && rs1_in != 0) forward1 = 2'b01;
     else forward1 = 2'b00;
     
-    if(rs2_in == EXMEM_rd) forward2 = 2'b10;
-    else if(rs2_in == MEMWB_rd) forward2 = 2'b01;
+    if(rs2_in == EXMEM_rd && rs2_in != 0) forward2 = 2'b10;
+    else if(rs2_in == MEMWB_rd && EXMEM_rd != rs2_in && rs2_in != 0) forward2 = 2'b01;
     else forward2 = 2'b00;
 end
 
