@@ -84,6 +84,11 @@ module cpu(
 	 //assign forward1 = 2'b00;
 	 //assign forward2 = 2'b00;
 	 
+	 //Signals for Hazard detection
+	 rv32i_word rs1_hazard;
+	 rv32i_word rs2_hazard;
+	 logic hazard_stall;
+	 
 	 logic stall;
 	 assign stall = (inst_read && !inst_resp) || (data_read && !data_resp) || (data_write && !data_resp);
 
@@ -120,6 +125,8 @@ module cpu(
         .ID_ctrl_out,
         .rs1_out, 
         .rs2_out,
+		  .rs1_hazard,
+		  .rs2_hazard,
         .ID_inst_out
     );
     
@@ -244,6 +251,13 @@ module cpu(
         .forward1,
         .forward2
     );
-    
+	 
+	 hazard_detection hazard_detection(
+			.mem_read(IDEX_ctrl_out.mem_read),
+			.rs1_hazard,
+			.rs2_hazard,
+			.rs2_out,
+			.hazard_stall
+    );
 
 endmodule : cpu

@@ -14,6 +14,8 @@ module ID(
 
     output rv32i_word rs1_out, 
     output rv32i_word rs2_out,
+	 output rv32i_word rs1_hazard,
+	 output rv32i_word rs2_hazard,
     output rv32i_word ID_inst_out
 );
 
@@ -33,6 +35,10 @@ assign opcode = rv32i_opcode'(inst[6:0]);
 
 //ID Control Out
 assign ID_ctrl_out = ctrl_out;
+
+//rs1 and 2 for hazard output
+assign rs1_hazard = rs1;
+assign rs2_hazard = rs2;
 
 control_rom control_rom(
     .opcode,
