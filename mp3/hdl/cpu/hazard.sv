@@ -11,8 +11,8 @@ module hazard_detection
 
 always_comb
 begin
-    if(mem_read && ((rs2_IDEX == rs2_IFID) || (rs2_IFID == rs2_IDEX))) stall = 1;
-    else stall = 0;
+    if(mem_read && ((rs2_IDEX == rs2_IFID) || (rs2_IFID == rs2_IDEX))) hazard_stall = 1;
+    else hazard_stall = 0;
 end
 
 endmodule : hazard_detection

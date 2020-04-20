@@ -8,8 +8,8 @@ module EX(
     input rv32i_word rs2_in,
     input rv32i_control_word EX_ctrl_in,
     input rv32i_word pc_in,
-    input forwardingmux1_sel_t forward1,
-    input forwardingmux2_sel_t forward2,
+    input logic [1:0] forward1,
+    input logic [1:0] forward2,
     input rv32i_word WB_regfile_in,
     input rv32i_word alu_out_EXMEM,
 
@@ -63,7 +63,7 @@ end
 
 
 cmp cmp(
-    .input1(EX_rs1_in),
+    .input1(fwdmux1_out),
 	.input2(cmpmux_out),
 	.cmpop(EX_ctrl_in.cmpop),
 	.br_en(cmp_out)
@@ -85,10 +85,24 @@ assign alu_mod2 = {alu_out[31:1], 1'b0};
 assign EX_alu_mod2 = alu_mod2;
 
 always_comb begin: Muxes
+	 unique case (forward1) //forwarding mux1
+        2'b00 : fwdmux1_out = EX_rs1_in;
+        2'b01 : fwdmux1_out = WB_regfile_in;
+        2'b10 : fwdmux1_out = alu_out_EXMEM;
+		  default : fwdmux1_out = EX_rs1_in;
+    endcase
+	 
+    unique case (forward2) //forwarding mux1
+		  2'b00: fwdmux2_out = EX_rs2_in;
+		  2'b01: fwdmux2_out = WB_regfile_in;
+		  2'b10: fwdmux2_out = alu_out_EXMEM;
+		  default : fwdmux2_out = EX_rs2_in;
+    endcase
+	 
     unique case (EX_ctrl_in.alumux1_sel) // alumux1
         alumux::rs1_out: alu_mux1_out = fwdmux1_out;
         alumux::pc_out : alu_mux1_out = pc_in;
-		  default: alu_mux1_out = EX_rs1_in;
+		  default: alu_mux1_out = fwdmux1_out;
     endcase
 
     unique case (EX_ctrl_in.alumux2_sel) // alumux2
@@ -102,19 +116,8 @@ always_comb begin: Muxes
     endcase
 
     unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
-        cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
+        cmpmux::rs2_out  : cmpmux_out = fwdmux2_out;
         cmpmux::i_imm    : cmpmux_out = i_imm;
-    endcase
-    
-    unique case (forward1) //forwarding mux1
-        forwarding::rs1 : fwdmux1_out = rs1_in;
-        forwarding::regfile_in : fwdmux1_out = WB_regfile_in;
-        forwarding::alu_out : fwdmux1_out = alu_out_EXMEM;
-    endcase
-    unique case (forward2) //forwarding mux1
-    forwarding::rs2 : fwdmux2_out = rs2_in;
-    forwarding::regfile_in : fwdmux2_out = WB_regfile_in;
-    forwarding::alu_out : fwdmux2_out = alu_out_EXMEM;
     endcase
 end
     

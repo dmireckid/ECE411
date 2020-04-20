@@ -102,7 +102,7 @@ cache icache (
 	.mem_byte_enable(icache_mem_byte_enable),
 	.mem_resp(icache_mem_resp),
 	.cache_hit(icache_hit),
-	    output logic [63:0] mem_wdata,
+	
 	//Cache <--> Arbiter
 	.pmem_address(icache_addr),
 	.pmem_rdata(icache_data),

@@ -81,6 +81,7 @@ assign write_en_mux0 = data_write && hit0 || !lru && datain_mux;
 assign write_en_mux1 = data_write && hit1 || lru && datain_mux;
 assign dataout_mux0 = hit0; 
 assign dataout_mux1 = hit1;
+
 //Tag/Hit
 assign tag_load0 = tag_load && !lru;
 assign tag_load1 = tag_load && lru;

@@ -50,16 +50,3 @@ typedef enum bit [3:0] {
 } regfilemux_sel_t;
 endpackage
  
-package forwarding;
- typedef enum bit [1:0] {
-    rs1 = 2'b00,
-    regfile_in = 2'b01,
-    alu_out = 2'b11
- } forwardingmux1_sel_t;
-                  
- typedef enum bit [1:0] {
-    rs2 = 2'b00,
-    regfile_in = 2'b01,
-    alu_out = 2'b11
- } forwardingmux2_sel_t;
-endpackage
