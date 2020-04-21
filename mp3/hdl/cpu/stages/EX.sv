@@ -105,8 +105,8 @@ end*/
 
 
 cmp cmp(
-    .input1(EX_rs1_in),
-	.input2(cmpmux_out),
+    .input1(fwdmux1_out),
+	.input2(fwdmux2_out),
 	.cmpop(EX_ctrl_in.cmpop),
 	.br_en(cmp_out)
 );
