@@ -33,19 +33,23 @@ module cpu(
     rv32i_control_word ID_ctrl_out;
     rv32i_word rs1_out, rs2_out, ID_inst_out;
 	logic [4:0] ID_rd;
+	 logic is_branch;
 
     //Signals for ID_EX
     rv32i_word inst_out_IDEX, pc_out_IDEX, rs1_out_IDEX, rs2_out_IDEX; 
     rv32i_control_word IDEX_ctrl_out;
+	 logic [4:0] rs1_hazard_out_IDEX;
+	 logic [4:0] rs2_hazard_out_IDEX;
 
     //Signals for EX
     rv32i_control_word EX_ctrl_out;
     rv32i_word EX_pc_imm, alu_out;
 	rv32i_word EX_rs2_out;
     logic [4:0] rd;
-    logic [31:0] EX_u_imm_out;
+    logic [31:0] EX_u_imm_out, branch_pc;
 	rv32i_word EX_alu_mod2;
     rv32i_word EX_pc_out;
+	 logic true_branch;
 
     //Signals for EX_MEM
 	logic [4:0] rd_in;
@@ -85,8 +89,8 @@ module cpu(
 	 //assign forward2 = 2'b00;
 	 
 	 //Signals for Hazard detection
-	 rv32i_word rs1_hazard;
-	 rv32i_word rs2_hazard;
+	 logic [4:0] rs1_hazard;
+	 logic [4:0] rs2_hazard;
 	 logic hazard_stall;
 	 
 	 logic stall;
@@ -96,9 +100,11 @@ module cpu(
         .clk,
         .rst,
         .pcmux_sel,
-        .pc_imm(alu_out),
+		  .is_branch,
+		  .true_branch,
+        .pc_imm(branch_pc),
 		  .pc_alu_mod2(EX_alu_mod2),
-        .pc_load(!stall && inst_resp),
+        .pc_load(!stall && !hazard_stall),
 		  .inst_read,
 		  .inst_addr,
         .pc_out
@@ -109,10 +115,11 @@ module cpu(
         .clk,
         .rst,
         .pc_out,
+		  .true_branch,
         .inst_rdata,
         .pc_out_IFID,
         .inst_out_IFID,
-		  .stall(!stall)
+		  .stall(!stall && !hazard_stall)
     );
 
     ID ID(
@@ -122,12 +129,15 @@ module cpu(
         .regfile_in(WB_regfilemux_out),
         .regfile_load(WB_ctrl_out.regfile_load),
         .ID_rd(rd_out_MEMWB),
+		  .hazard_stall,
         .ID_ctrl_out,
         .rs1_out, 
         .rs2_out,
 		  .rs1_hazard,
 		  .rs2_hazard,
-        .ID_inst_out
+        .ID_inst_out,
+		  .is_branch,
+		  .true_branch
     );
     
 
@@ -137,14 +147,19 @@ module cpu(
         .pc_out_IFID,
         .ID_ctrl_out,
         .inst_out_IFID,
+		  .rs1_hazard, 
+		  .rs2_hazard,
         .rs1_out,
         .rs2_out,
         .pc_out_IDEX,
         .IDEX_ctrl_out,
         .inst_out_IDEX,
-		.rs1_out_IDEX,
-		.rs2_out_IDEX,
-		.stall(!stall)
+		  .rs1_out_IDEX,
+		  .rs2_out_IDEX,
+		  .rs1_hazard_out_IDEX,
+		  .rs2_hazard_out_IDEX,
+		  .stall(!stall && !hazard_stall),
+		  .hazard_stall
     );
 
     EX EX(
@@ -166,7 +181,9 @@ module cpu(
         .EX_u_imm_out,
 	    .EX_alu_mod2,
 		.pcmux_sel,
-        .EX_pc_out
+        .EX_pc_out,
+		  .branch_pc,
+		  .true_branch
     );
 
 
@@ -244,8 +261,8 @@ module cpu(
 
 	 
     forwarding_unit forwarding_unit(
-        .rs1_in(rs1_out_IDEX),
-        .rs2_in(rs2_out_IDEX),
+        .rs1_in(rs1_hazard_out_IDEX),
+        .rs2_in(rs2_hazard_out_IDEX),
         .EXMEM_rd(rd_out_EXMEM),
         .MEMWB_rd(rd_out_MEMWB),
         .forward1,
@@ -256,7 +273,7 @@ module cpu(
 			.mem_read(IDEX_ctrl_out.mem_read),
 			.rs1_hazard,
 			.rs2_hazard,
-			.rs2_out,
+			.rs2_out_IDEX(rs2_hazard_out_IDEX),
 			.hazard_stall
     );
 

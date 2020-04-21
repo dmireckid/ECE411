@@ -47,7 +47,7 @@ begin
         op_br: begin
             ctrl.alumux1_sel = alumux::pc_out;
             ctrl.alumux2_sel = alumux::b_imm;
-            ctrl.aluop = alu_add;
+            //ctrl.aluop = alu_add;
             ctrl.pcmux_sel = pcmux::alu_out;
             ctrl.cmpop = branch_funct3_t'(funct3);
         end

@@ -1,11 +1,9 @@
-import rv32i_types::*;
-
 module forwarding_unit
 (
-    input rv32i_word rs1_in,
-    input rv32i_word rs2_in,
-    input rv32i_word EXMEM_rd,
-    input rv32i_word MEMWB_rd,
+    input logic [4:0] rs1_in,
+    input logic [4:0] rs2_in,
+    input logic [4:0] EXMEM_rd,
+    input logic [4:0] MEMWB_rd,
     output logic [1:0] forward1,
     output logic [1:0] forward2
 );

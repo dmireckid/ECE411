@@ -8,15 +8,18 @@ module ID(
     input rv32i_word regfile_in,
     input logic regfile_load,
     input logic [4:0] ID_rd,
+	 input logic hazard_stall,
+	 input logic true_branch,
     
     
     output rv32i_control_word ID_ctrl_out,
 
     output rv32i_word rs1_out, 
     output rv32i_word rs2_out,
-	 output rv32i_word rs1_hazard,
-	 output rv32i_word rs2_hazard,
-    output rv32i_word ID_inst_out
+	 output logic [4:0] rs1_hazard,
+	 output logic [4:0] rs2_hazard,
+    output rv32i_word ID_inst_out,
+	 output logic is_branch
 );
 
 assign ID_inst_out = inst;
@@ -34,7 +37,7 @@ assign funct7 = inst[31:25];
 assign opcode = rv32i_opcode'(inst[6:0]);
 
 //ID Control Out
-assign ID_ctrl_out = ctrl_out;
+//assign ID_ctrl_out = ctrl_out;
 
 //rs1 and 2 for hazard output
 assign rs1_hazard = rs1;
@@ -59,6 +62,25 @@ regfile regfile(
     .reg_b(rs2_out)
 );
 
+always_comb begin
+	if (opcode == op_br || opcode == op_jal || opcode == op_jalr) begin
+		is_branch = 1'b1;
+	end
+	else begin
+		is_branch = 1'b0;
+	end
+end
 
+logic stall_miss;
+assign stall_miss = hazard_stall || true_branch;
+
+
+always_comb begin 
+	 unique case(stall_miss)
+				1'b0: ID_ctrl_out = ctrl_out;
+				1'b1: ID_ctrl_out = 32'b0;
+				default: ID_ctrl_out = ctrl_out;
+	 endcase
+end
 
 endmodule : ID

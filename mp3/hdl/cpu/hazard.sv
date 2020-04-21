@@ -1,17 +1,15 @@
-import rv32i_types::*;
-
 module hazard_detection
 (
     input logic mem_read,
-    input rv32i_word rs1_hazard,
-    input rv32i_word rs2_hazard,
-    input rv32i_word rs2_out,
+    input logic [4:0] rs1_hazard,
+    input logic [4:0] rs2_hazard,
+    input logic [4:0] rs2_out_IDEX,
     output logic hazard_stall
 );
 
 always_comb
 begin
-    if(mem_read && ((rs1_hazard == rs2_out) || (rs2_hazard == rs2_out))) hazard_stall = 1;
+    if(mem_read && ((rs1_hazard == rs2_out_IDEX) || (rs2_hazard == rs2_out_IDEX))) hazard_stall = 1;
     else hazard_stall = 0;
 end
 
