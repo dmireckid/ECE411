@@ -18,7 +18,7 @@ rv32i_word pcmux_out;
 pcmux::pcmux_sel_t pc_mux;
 
 always_comb begin
-	if(is_branch == 1'b1 && true_branch) begin
+	if(is_branch == 1'b1 && !true_branch) begin
 		pc_mux = pcmux::pc_plus4;
 	end
 	else if (true_branch) begin

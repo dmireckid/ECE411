@@ -15,13 +15,13 @@ always_comb
 begin
     /* Default assignments */
     ctrl.opcode = opcode;
-    ctrl.aluop = alu_ops'(funct3);
+    ctrl.aluop = alu_add;
     ctrl.pcmux_sel = pcmux::pc_plus4;
     ctrl.cmpmux_sel = cmpmux::rs2_out;
     ctrl.alumux1_sel = alumux::rs1_out;
     ctrl.alumux2_sel = alumux::i_imm;
     ctrl.regfilemux_sel = regfilemux::alu_out;
-    ctrl.cmpop = branch_funct3_t'(funct3);
+    ctrl.cmpop = branch_funct3_t'(3'b000);
     ctrl.mem_read = 1'b0;
     ctrl.mem_write = 1'b0;
     //ctrl.pc_load = 1'b0;   Don't need?

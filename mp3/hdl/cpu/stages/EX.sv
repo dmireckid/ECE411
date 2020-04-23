@@ -162,7 +162,7 @@ always_comb begin: Muxes
         cmpmux::i_imm    : cmpmux_out = i_imm;
     endcase
 	 
-	 unique case(EX_ctrl_out.opcode)
+	 unique case(EX_ctrl_in.opcode)
 		op_jal: begin
 			branch_pc_int = EX_pc_out + j_imm;
 			pcmux_sel_int = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && 2'b01);

@@ -35,7 +35,7 @@ begin
 				if (input1 >= input2) br_en = 1'b1;
 				else br_en = 1'b0;
 		  end	
-		  default:;
+		  default: br_en = 1'b0;
 	 endcase
 end
 

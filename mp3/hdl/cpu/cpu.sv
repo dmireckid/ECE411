@@ -159,7 +159,8 @@ module cpu(
 		  .rs1_hazard_out_IDEX,
 		  .rs2_hazard_out_IDEX,
 		  .stall(!stall && !hazard_stall),
-		  .hazard_stall
+		  .hazard_stall,
+		  .true_branch
     );
 
     EX EX(
