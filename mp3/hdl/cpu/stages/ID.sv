@@ -20,7 +20,13 @@ module ID(
 	 output logic [4:0] rs2_hazard,
 	 output logic [4:0] ID_rd_out,
     output rv32i_word ID_inst_out,
-	 output logic is_branch
+	 output logic is_branch,
+
+	 input RVFIMonPacket ID_packet_in,
+	 output RVFIMonPacket ID_packet_out,
+	 
+	 input rv32i_word ID_pcmux_in,
+	 output rv32i_word ID_pcmux_out
 );
 
 assign ID_inst_out = inst;
@@ -45,6 +51,30 @@ assign rd_int = inst[11:7];
 assign rs1_hazard = rs1;
 assign rs2_hazard = rs2;
 
+//rvfi_monitor
+	 //synthesis translate_off
+	assign ID_packet_out.commit = 0;
+	assign ID_packet_out.inst = inst;
+	assign ID_packet_out.trap = 0;
+	assign ID_packet_out.rs1_addr = rs1;
+	assign ID_packet_out.rs2_addr = rs2;
+	assign ID_packet_out.rs1_rdata = rs1_out;
+	assign ID_packet_out.rs2_rdata = rs2_out;
+	assign ID_packet_out.load_regfile = regfile_load;
+	assign ID_packet_out.rd_addr = 0;
+	assign ID_packet_out.rd_wdata = regfile_in;
+	assign ID_packet_out.pc_rdata = ID_packet_in.pc_rdata;
+	assign ID_packet_out.pc_wdata = ID_pcmux_in;
+	assign ID_packet_out.mem_addr = 0;
+	assign ID_packet_out.mem_rmask = 0;
+	assign ID_packet_out.mem_wmask = 0;
+	assign ID_packet_out.mem_rdata = 0;
+	assign ID_packet_out.mem_wdata = 0;
+	assign ID_packet_out.errorcode = 0;
+	//synthesis translate_on
+
+	assign ID_pcmux_out = ID_pcmux_in;
+	
 control_rom control_rom(
     .opcode,
     .funct7,

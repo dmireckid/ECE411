@@ -89,5 +89,28 @@ typedef enum bit [2:0] {
 
  } rv32i_control_word;
 
+   typedef struct packed {
+
+   logic commit;
+	rv32i_word inst; 
+    logic trap; 
+	rv32i_reg rs1_addr; 
+	rv32i_reg rs2_addr; 
+	rv32i_word rs1_rdata; 
+	rv32i_word rs2_rdata; 
+    logic load_regfile; 
+    rv32i_reg rd_addr; 
+    rv32i_word rd_wdata; 
+    rv32i_word pc_rdata; 
+    rv32i_word pc_wdata; 
+    rv32i_word mem_addr; 
+    rv32i_mem_wmask mem_rmask; 
+    rv32i_mem_wmask mem_wmask; 
+    rv32i_word mem_rdata;
+    rv32i_word mem_wdata; 
+    logic [15:0] errorcode; 
+	 
+} RVFIMonPacket;
+
 endpackage : rv32i_types
 

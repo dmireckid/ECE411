@@ -22,7 +22,11 @@ module EX(
 	output pcmux::pcmux_sel_t pcmux_sel,
     output rv32i_word EX_pc_out,
 	 output logic [31:0] branch_pc,
-	 output logic true_branch
+	 output logic true_branch,
+	 input RVFIMonPacket EX_packet_in,
+	 output RVFIMonPacket EX_packet_out,
+	 input rv32i_word EX_pcmux_in,
+	 output rv32i_word EX_pcmux_out
 );
 
 
@@ -50,6 +54,8 @@ assign branch_pc = branch_pc_int;
 pcmux::pcmux_sel_t pcmux_sel_int;
 assign pcmux_sel = pcmux_sel_int;
 
+assign EX_pcmux_out = EX_pcmux_in;
+
 //Imm Gen
 assign i_imm = {{21{inst[31]}}, inst[30:20]};
 assign s_imm = {{21{inst[31]}}, inst[30:25], inst[11:7]};
@@ -63,6 +69,85 @@ assign rd_temp = rd_out_IDEX;
 assign EX_u_imm_out = u_imm;
 //assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
 assign EX_pc_out = pc_in;
+
+//rvfi_monitor
+logic trap;
+logic [4:0] rs1_addr, rs2_addr;
+logic [3:0] rmask, wmask;
+rv32i_opcode opcode;
+logic [2:0] funct3;
+assign funct3 = inst[14:12];
+assign opcode = rv32i_opcode'(inst[6:0]);
+
+branch_funct3_t branch_funct3;
+store_funct3_t store_funct3;
+load_funct3_t load_funct3;
+
+
+
+assign branch_funct3 = branch_funct3_t'(funct3);
+assign load_funct3 = load_funct3_t'(funct3);
+assign store_funct3 = store_funct3_t'(funct3);
+
+
+always_comb
+begin : trap_check
+    trap = 0;
+    rmask = '0;
+    wmask = '0;
+
+    case (opcode)
+        op_lui, op_auipc, op_imm, op_reg, op_jal, op_jalr:;
+
+        op_br: begin
+            case (branch_funct3)
+                beq, bne, blt, bge, bltu, bgeu:;
+                default: trap = 1;
+            endcase
+        end
+
+        op_load: begin
+            case (load_funct3)
+                lw: rmask = 4'b1111;
+                lh, lhu: rmask = 4'b0011 /* Modify for MP1 Final */ ;
+                lb, lbu: rmask = 4'b0001 /* Modify for MP1 Final */ ;
+                default: trap = 1;
+            endcase
+        end
+
+        op_store: begin
+            case (store_funct3)
+                sw: wmask = 4'b1111;
+                sh: wmask = 4'b0011 /* Modify for MP1 Final */ ;
+                sb: wmask = 4'b0001 /* Modify for MP1 Final */ ;
+                default: trap = 1;
+            endcase
+        end
+
+        default: trap = 1;
+    endcase
+end
+
+	 //synthesis translate_off
+	assign EX_packet_out.commit = 0;
+	assign EX_packet_out.inst = inst;
+	assign EX_packet_out.trap = trap;
+	assign EX_packet_out.rs1_addr = EX_packet_in.rs1_addr;
+	assign EX_packet_out.rs2_addr = EX_packet_in.rs2_addr;
+	assign EX_packet_out.rs1_rdata = EX_packet_in.rs1_rdata ;
+	assign EX_packet_out.rs2_rdata = EX_packet_in.rs2_rdata;
+	assign EX_packet_out.load_regfile = EX_packet_in.load_regfile;
+	assign EX_packet_out.rd_addr = 0;
+	assign EX_packet_out.rd_wdata = EX_packet_in.rd_wdata;
+	assign EX_packet_out.pc_rdata = EX_pc_out;
+	assign EX_packet_out.pc_wdata = EX_packet_in.pc_wdata;
+	assign EX_packet_out.mem_addr = 0;
+	assign EX_packet_out.mem_rmask = rmask;
+	assign EX_packet_out.mem_wmask = wmask;
+	assign EX_packet_out.mem_rdata = 0;
+	assign EX_packet_out.mem_wdata = 0;
+	assign EX_packet_out.errorcode = 0;
+	 //synthesis translate_on
 
 /*
 always_comb begin

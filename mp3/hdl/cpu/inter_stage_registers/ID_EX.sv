@@ -21,7 +21,13 @@ module ID_EX(
     output rv32i_word rs2_out_IDEX,
 	 output logic [4:0] rs1_hazard_out_IDEX,
 	 output logic [4:0] rs2_hazard_out_IDEX,
-	 output logic [4:0] rd_out_IDEX
+	 output logic [4:0] rd_out_IDEX,
+	 
+	 input RVFIMonPacket ID_EX_packet_in,
+	 output RVFIMonPacket ID_EX_packet_out,
+	 
+	 input rv32i_word ID_EX_pcmux_in,
+	 output rv32i_word ID_EX_pcmux_out
 );
 
 register pc_IDEX(
@@ -88,7 +94,21 @@ register #(.width(5)) _rd(
     .out(rd_out_IDEX)
 );
 
+register #(.width($bits(RVFIMonPacket))) packet_IDEX(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(ID_EX_packet_in),
+    .out(ID_EX_packet_out)
+);
 
+register pcmux_out_IDEX(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(ID_EX_pcmux_in),
+    .out(ID_EX_pcmux_out)
+);
 
 
 endmodule : ID_EX

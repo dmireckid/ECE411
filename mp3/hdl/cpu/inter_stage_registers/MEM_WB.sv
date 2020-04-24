@@ -15,7 +15,10 @@ module MEM_WB(
     output logic [4:0] rd_out_MEMWB,
     output rv32i_word alu_out_MEMWB,
     output rv32i_control_word MEMWB_ctrl_out,
-    output rv32i_word MEMWB_pc_out
+    output rv32i_word MEMWB_pc_out,
+	 
+	 input RVFIMonPacket MEM_WB_packet_in,
+	 output RVFIMonPacket MEM_WB_packet_out
 );
 
 register alu_MEMWB(
@@ -64,6 +67,14 @@ register pc_MEMWB(
     .load(stall),
     .in(MEMWB_pc_in),
     .out(MEMWB_pc_out)
+);
+
+register #(.width($bits(RVFIMonPacket))) packet_MEMWB(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(MEM_WB_packet_in),
+    .out(MEM_WB_packet_out)
 );
 
 

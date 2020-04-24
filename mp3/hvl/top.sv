@@ -19,10 +19,29 @@ source_tb tb(
 /************************ Signals necessary for monitor **********************/
 // This section not required until CP3F
 
-assign rvfi.commit = 0; // Set high when a valid instruction is modifying regfile or PC
+assign rvfi.commit = dut.cpu.WB_packet_out.commit; // Set high when a valid instruction is modifying regfile or PC
 //assign rvfi.halt = 0;   // Set high when you detect an infinite loop
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
+
+assign rvfi.inst = dut.cpu.WB_packet_out.inst;
+assign rvfi.trap = dut.cpu.WB_packet_out.trap;
+assign rvfi.rs1_addr = dut.cpu.WB_packet_out.rs1_addr;
+assign rvfi.rs2_addr = dut.cpu.WB_packet_out.rs2_addr;
+assign rvfi.rs1_rdata = dut.cpu.WB_packet_out.rs1_rdata;
+assign rvfi.rs2_rdata = dut.cpu.WB_packet_out.rs2_rdata;
+assign rvfi.load_regfile = dut.cpu.WB_packet_out.load_regfile;
+assign rvfi.rd_addr = dut.cpu.WB_packet_out.rd_addr;
+assign rvfi.rd_wdata = dut.cpu.WB_packet_out.rd_wdata;
+assign rvfi.pc_rdata = dut.cpu.WB_packet_out.pc_rdata;
+assign rvfi.pc_wdata = dut.cpu.WB_packet_out.pc_wdata;
+// NOTE: dut.cpu.datapath.mem_addr should be byte or 4-byte aligned
+//       memory address for all loads and stores (including fetches)
+assign rvfi.mem_addr = dut.cpu.WB_packet_out.mem_addr;
+assign rvfi.mem_rmask = dut.cpu.WB_packet_out.mem_rmask;
+assign rvfi.mem_wmask = dut.cpu.WB_packet_out.mem_wmask;
+assign rvfi.mem_rdata = dut.cpu.WB_packet_out.mem_rdata;
+assign rvfi.mem_wdata = dut.cpu.WB_packet_out.mem_wdata;
 /**************************** End RVFIMON signals ****************************/
 
 /********************* Assign Shadow Memory Signals Here *********************/

@@ -8,7 +8,12 @@ module IF_ID(
 	 input logic true_branch,
     input logic [31:0] inst_rdata,
     output rv32i_word pc_out_IFID,
-    output rv32i_word inst_out_IFID
+    output rv32i_word inst_out_IFID,
+	 
+	 input RVFIMonPacket IF_ID_packet_in,
+	 output RVFIMonPacket IF_ID_packet_out,
+	 input rv32i_word IF_ID_pcmux_in,
+	 output rv32i_word IF_ID_pcmux_out
 );
 
 
@@ -39,6 +44,21 @@ register inst_IFID(
     .out(inst_out_IFID_int)
 );
 
+register #(.width($bits(RVFIMonPacket))) packet_IFID(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(IF_ID_packet_in),
+    .out(IF_ID_packet_out)
+);
+
+register pcmux_out_IFID(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(IF_ID_pcmux_in),
+    .out(IF_ID_pcmux_out)
+);
 
 always_comb begin
 	if (true_branch) begin

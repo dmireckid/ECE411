@@ -15,7 +15,10 @@ module EX_MEM(
     output rv32i_word alu_out_EXMEM,
     output rv32i_word rs2_out_EXMEM,
     output rv32i_word u_imm_out_EXMEM,
-    output rv32i_word EXMEM_pc_out
+    output rv32i_word EXMEM_pc_out,
+	 
+	 input RVFIMonPacket EX_MEM_packet_in,
+	 output RVFIMonPacket EX_MEM_packet_out
 );
 
 register #(.width($bits(rv32i_control_word))) ctrl_EXMEM(
@@ -64,6 +67,14 @@ register pc_EXMEM(
     .load(stall),
     .in(EXMEM_pc_in),
     .out(EXMEM_pc_out)
+);
+
+register #(.width($bits(RVFIMonPacket))) packet_EXMEM(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(EX_MEM_packet_in),
+    .out(EX_MEM_packet_out)
 );
 
 endmodule : EX_MEM

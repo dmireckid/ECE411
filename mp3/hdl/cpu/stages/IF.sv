@@ -11,7 +11,10 @@ module IF(
 	 input logic true_branch,
     output rv32i_word pc_out,
 	output logic [31:0] inst_addr,
-	output logic inst_read
+	output logic inst_read,
+
+	output RVFIMonPacket IF_packet_out,
+	output rv32i_word IF_pcmux_out
 );
 
 rv32i_word pcmux_out;
@@ -32,6 +35,32 @@ end
 
 assign inst_read = 1'b1;
 assign inst_addr = pc_out;
+assign IF_pcmux_out = pcmux_out;
+
+	RVFIMonPacket packet;
+
+	//rvfi_monitor
+	 //synthesis translate_off
+	assign packet.commit = 0;
+	assign packet.inst = 0;
+	assign packet.trap = 0;
+	assign packet.rs1_addr = 0;
+	assign packet.rs2_addr = 0;
+	assign packet.rs1_rdata = 0;
+	assign packet.rs2_rdata = 0;
+	assign packet.load_regfile = 0;
+	assign packet.rd_addr = 0;
+	assign packet.rd_wdata = 0;
+	assign packet.pc_rdata = 0;
+	assign packet.pc_wdata = pcmux_out;
+	assign packet.mem_addr = 0;
+	assign packet.mem_rmask = 0;
+	assign packet.mem_wmask = 0;
+	assign packet.mem_rdata = 0;
+	assign packet.mem_wdata = 0;
+	assign packet.errorcode = 0;
+	//synthesis translate_on
+	assign IF_packet_out = packet;
 
 pc_register pc(
     .clk,

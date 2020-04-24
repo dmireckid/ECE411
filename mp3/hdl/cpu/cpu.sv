@@ -92,6 +92,22 @@ module cpu(
 	 logic [4:0] rs1_hazard;
 	 logic [4:0] rs2_hazard;
 	 logic hazard_stall;
+
+     //Signals for RVFI
+	RVFIMonPacket IF_packet_out;
+	 RVFIMonPacket IF_ID_packet_out;
+	RVFIMonPacket ID_packet_out;
+	 RVFIMonPacket ID_EX_packet_out;
+	 RVFIMonPacket EX_packet_out;
+	 RVFIMonPacket EX_MEM_packet_out;
+	 RVFIMonPacket MEM_packet_out;
+	 RVFIMonPacket MEM_WB_packet_out;
+	 RVFIMonPacket WB_packet_out;
+	 rv32i_word IF_pcmux_out;
+	 rv32i_word IF_ID_pcmux_out;
+	 rv32i_word ID_pcmux_out;
+	 rv32i_word ID_EX_pcmux_out;
+	 rv32i_word EX_pcmux_out;
 	 
 	 logic stall;
 	 assign stall = (inst_read && !inst_resp) || (data_read && !data_resp) || (data_write && !data_resp);
@@ -107,7 +123,9 @@ module cpu(
         .pc_load(!stall && !hazard_stall),
 		  .inst_read,
 		  .inst_addr,
-        .pc_out
+        .pc_out,
+		  .IF_packet_out,
+		  .IF_pcmux_out
     );
     //assign pcmux_sel = EX_ctrl_out.pcmux_sel;
 
@@ -119,7 +137,11 @@ module cpu(
         .inst_rdata,
         .pc_out_IFID,
         .inst_out_IFID,
-		  .stall(!stall && !hazard_stall)
+		  .stall(!stall && !hazard_stall),
+		  .IF_ID_packet_in(IF_packet_out),
+		  .IF_ID_packet_out,
+		  .IF_ID_pcmux_in(IF_pcmux_out),
+		  .IF_ID_pcmux_out
     );
 
     ID ID(
@@ -138,7 +160,11 @@ module cpu(
         .ID_inst_out,
 		  .is_branch,
 		  .true_branch,
-		  .ID_rd_out
+		  .ID_rd_out,
+		  .ID_packet_in(IF_ID_packet_out),
+		  .ID_packet_out,
+		  .ID_pcmux_in(IF_ID_pcmux_out),
+		  .ID_pcmux_out
     );
     
 
@@ -163,7 +189,11 @@ module cpu(
 		  .stall(!stall),
 		  .hazard_stall,
 		  .true_branch,
-		  .rd_out_IDEX
+		  .rd_out_IDEX,
+		.ID_EX_packet_in(ID_packet_out),
+		.ID_EX_packet_out,
+		.ID_EX_pcmux_in(ID_pcmux_out),
+		.ID_EX_pcmux_out
     );
 
     EX EX(
@@ -188,7 +218,11 @@ module cpu(
 		.pcmux_sel,
         .EX_pc_out,
 		  .branch_pc,
-		  .true_branch
+		  .true_branch,
+		  .EX_packet_in(ID_EX_packet_out),
+		  .EX_packet_out,
+		  .EX_pcmux_in(ID_EX_pcmux_out),
+		  .EX_pcmux_out
     );
 
 
@@ -207,7 +241,9 @@ module cpu(
         .rs2_out_EXMEM,
         .EXMEM_pc_in(EX_pc_out),
         .EXMEM_pc_out,
-		  .stall(!stall)
+		  .stall(!stall),
+		  .EX_MEM_packet_in(EX_packet_out),
+		  .EX_MEM_packet_out
     );
  
     MEM MEM(
@@ -228,7 +264,9 @@ module cpu(
         .MEM_ctrl_out,
 		.MEM_rd_out,
         .MEM_pc_in(EXMEM_pc_out),
-        .MEM_pc_out
+        .MEM_pc_out,
+		  .MEM_packet_in(EX_MEM_packet_out),
+		  .MEM_packet_out
     );
 
     MEM_WB MEM_WB(
@@ -246,7 +284,9 @@ module cpu(
         .MEMWB_ctrl_out,
         .MEMWB_pc_in(MEM_pc_out),
         .MEMWB_pc_out,
-		  .stall(!stall)
+		  .stall(!stall),
+		  .MEM_WB_packet_in(MEM_packet_out),
+		  .MEM_WB_packet_out
     );
 
 
@@ -261,7 +301,11 @@ module cpu(
 		.WB_ctrl_out,
         .WB_regfilemux_out,
 		.WB_rd_out,
-        .WB_pc_in(MEMWB_pc_out)
+        .WB_pc_in(MEMWB_pc_out),
+		  .WB_packet_in(MEM_WB_packet_out),
+		  .WB_packet_out,
+		  .pc_load(!stall && ins_resp),
+		  .pc_wdata(EX_pcmux_out)
     );
 
 	 
