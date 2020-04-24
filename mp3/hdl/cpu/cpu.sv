@@ -32,13 +32,13 @@ module cpu(
     //Signals for ID
     rv32i_control_word ID_ctrl_out;
     rv32i_word rs1_out, rs2_out, ID_inst_out;
-	logic [4:0] ID_rd;
+	logic [4:0] ID_rd_in, ID_rd_out;
 	 logic is_branch;
 
     //Signals for ID_EX
     rv32i_word inst_out_IDEX, pc_out_IDEX, rs1_out_IDEX, rs2_out_IDEX; 
     rv32i_control_word IDEX_ctrl_out;
-	 logic [4:0] rs1_hazard_out_IDEX;
+	 logic [4:0] rs1_hazard_out_IDEX, rd_out_IDEX;
 	 logic [4:0] rs2_hazard_out_IDEX;
 
     //Signals for EX
@@ -128,7 +128,7 @@ module cpu(
         .inst(inst_out_IFID),
         .regfile_in(WB_regfilemux_out),
         .regfile_load(WB_ctrl_out.regfile_load),
-        .ID_rd(rd_out_MEMWB),
+        .ID_rd_in(rd_out_MEMWB),
 		  .hazard_stall,
         .ID_ctrl_out,
         .rs1_out, 
@@ -137,7 +137,8 @@ module cpu(
 		  .rs2_hazard,
         .ID_inst_out,
 		  .is_branch,
-		  .true_branch
+		  .true_branch,
+		  .ID_rd_out
     );
     
 
@@ -147,6 +148,7 @@ module cpu(
         .pc_out_IFID,
         .ID_ctrl_out,
         .inst_out_IFID,
+		  .ID_rd_out,
 		  .rs1_hazard, 
 		  .rs2_hazard,
         .rs1_out,
@@ -158,9 +160,10 @@ module cpu(
 		  .rs2_out_IDEX,
 		  .rs1_hazard_out_IDEX,
 		  .rs2_hazard_out_IDEX,
-		  .stall(!stall && !hazard_stall),
+		  .stall(!stall),
 		  .hazard_stall,
-		  .true_branch
+		  .true_branch,
+		  .rd_out_IDEX
     );
 
     EX EX(
@@ -171,6 +174,7 @@ module cpu(
         .rs2_in(rs2_out_IDEX),
         .EX_ctrl_in(IDEX_ctrl_out),
         .pc_in(pc_out_IDEX),
+		  .rd_out_IDEX,
         .forward1,
         .forward2,
         .WB_regfile_in(WB_regfilemux_out),
@@ -266,6 +270,8 @@ module cpu(
         .rs2_in(rs2_hazard_out_IDEX),
         .EXMEM_rd(rd_out_EXMEM),
         .MEMWB_rd(rd_out_MEMWB),
+		  .regwrite_exmem(EXMEM_ctrl_out.regfile_load),
+		  .regwrite_memwb(MEMWB_ctrl_out.regfile_load),
         .forward1,
         .forward2
     );
@@ -274,7 +280,7 @@ module cpu(
 			.mem_read(IDEX_ctrl_out.mem_read),
 			.rs1_hazard,
 			.rs2_hazard,
-			.rs2_out_IDEX(rs2_hazard_out_IDEX),
+			.rs2_out_IDEX(rd_out_IDEX),
 			.hazard_stall
     );
 

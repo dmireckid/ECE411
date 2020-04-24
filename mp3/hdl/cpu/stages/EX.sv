@@ -12,7 +12,7 @@ module EX(
     input logic [1:0] forward2,
     input rv32i_word WB_regfile_in,
     input rv32i_word alu_out_EXMEM,
-
+	 input logic [4:0] rd_out_IDEX,
     output rv32i_word EX_rs2_out,
     output rv32i_word alu_out,
     output rv32i_control_word EX_ctrl_out,
@@ -31,7 +31,7 @@ logic [4:0] rd_temp;
 rv32i_word alu_mux1_out;
 rv32i_word alu_mux2_out, alu_mod2;
 rv32i_word EX_rs1_in, EX_rs2_in;
-rv32i_word cmpmux_out;
+//rv32i_word cmpmux_out;
 rv32i_word fwdmux1_out;
 rv32i_word fwdmux2_out;
 
@@ -56,7 +56,7 @@ assign s_imm = {{21{inst[31]}}, inst[30:25], inst[11:7]};
 assign b_imm = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
 assign u_imm = {inst[31:12], 12'h000};
 assign j_imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
-assign rd_temp = inst[11:7];
+assign rd_temp = rd_out_IDEX;
 
 //assign EX_ctrl_out = EX_ctrl_in;
 
@@ -156,12 +156,12 @@ always_comb begin: Muxes
         alumux::rs2_out : alu_mux2_out = fwdmux2_out;
 		  default: alu_mux2_out = fwdmux2_out;
     endcase
-
+	 /*
     unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
         cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
         cmpmux::i_imm    : cmpmux_out = i_imm;
     endcase
-	 
+	 */
 	 unique case(EX_ctrl_in.opcode)
 		op_jal: begin
 			branch_pc_int = EX_pc_out + j_imm;

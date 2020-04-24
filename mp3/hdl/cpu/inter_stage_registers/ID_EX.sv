@@ -10,6 +10,7 @@ module ID_EX(
     input rv32i_word rs2_out,
 	 input logic [4:0] rs1_hazard,
 	 input logic [4:0] rs2_hazard,
+	 input logic [4:0] ID_rd_out,
 	 input logic stall,
 	 input logic hazard_stall,
 	 input logic true_branch,
@@ -19,7 +20,8 @@ module ID_EX(
     output rv32i_word rs1_out_IDEX,
     output rv32i_word rs2_out_IDEX,
 	 output logic [4:0] rs1_hazard_out_IDEX,
-	 output logic [4:0] rs2_hazard_out_IDEX
+	 output logic [4:0] rs2_hazard_out_IDEX,
+	 output logic [4:0] rd_out_IDEX
 );
 
 register pc_IDEX(
@@ -62,7 +64,7 @@ register rs2_IDEX(
     .out(rs2_out_IDEX)
 );
 
-register #(.width(5)) rs1_rd(
+register #(.width(5)) rs1_h(
     .clk,
     .rst(rst || true_branch),
     .load(stall),
@@ -70,7 +72,7 @@ register #(.width(5)) rs1_rd(
     .out(rs1_hazard_out_IDEX)
 );
 
-register #(.width(5)) rs2_rd(
+register #(.width(5)) rs2_h(
     .clk,
     .rst(rst || true_branch),
     .load(stall),
@@ -78,6 +80,13 @@ register #(.width(5)) rs2_rd(
     .out(rs2_hazard_out_IDEX)
 );
 
+register #(.width(5)) _rd(
+    .clk,
+    .rst(rst || true_branch),
+    .load(stall),
+    .in(ID_rd_out),
+    .out(rd_out_IDEX)
+);
 
 
 

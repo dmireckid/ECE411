@@ -9,7 +9,7 @@ module hazard_detection
 
 always_comb
 begin
-    if(mem_read && ((rs1_hazard == rs2_out_IDEX) || (rs2_hazard == rs2_out_IDEX))) hazard_stall = 1;
+    if(mem_read == 1'b1 && ((rs1_hazard == rs2_out_IDEX) || (rs2_hazard == rs2_out_IDEX))) hazard_stall = 1;
     else hazard_stall = 0;
 end
 
