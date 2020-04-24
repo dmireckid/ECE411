@@ -35,7 +35,6 @@ logic [4:0] rd_temp;
 rv32i_word alu_mux1_out;
 rv32i_word alu_mux2_out, alu_mod2;
 rv32i_word EX_rs1_in, EX_rs2_in;
-//rv32i_word cmpmux_out;
 rv32i_word fwdmux1_out;
 rv32i_word fwdmux2_out;
 
@@ -64,10 +63,7 @@ assign u_imm = {inst[31:12], 12'h000};
 assign j_imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
 assign rd_temp = rd_out_IDEX;
 
-//assign EX_ctrl_out = EX_ctrl_in;
-
 assign EX_u_imm_out = u_imm;
-//assign pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
 assign EX_pc_out = pc_in;
 
 //rvfi_monitor
@@ -82,8 +78,6 @@ assign opcode = rv32i_opcode'(inst[6:0]);
 branch_funct3_t branch_funct3;
 store_funct3_t store_funct3;
 load_funct3_t load_funct3;
-
-
 
 assign branch_funct3 = branch_funct3_t'(funct3);
 assign load_funct3 = load_funct3_t'(funct3);
@@ -149,46 +143,6 @@ end
 	assign EX_packet_out.errorcode = 0;
 	 //synthesis translate_on
 
-/*
-always_comb begin
-	if(EX_ctrl_out.opcode == op_jalr) begin
-		pcmux_sel = EX_ctrl_out.pcmux_sel;
-	end
-	else begin
-		pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
-	end
-end*/
- /*
-always_comb
-begin
-	unique case(EX_ctrl_out.opcode)
-		op_jal: begin
-			branch_pc = EX_pc_out + j_imm;
-			pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && 2'b01);
-			true_branch = 1'b1;
-		end
-		
-		op_jalr: begin
-			branch_pc = (EX_rs1_in + i_imm) & 32'hFFFFFFFE;
-			pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && 2'b01);
-			true_branch = 1'b1;
-		end
-		
-		op_br: begin 
-			branch_pc = EX_pc_out + b_imm;
-			pcmux_sel = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
-			true_branch = cmp_out;
-		end
-		
-		default: begin
-			branch_pc = 32'b0;
-			true_branch = 1'b0;
-			pcmux_sel = EX_ctrl_out.pcmux_sel;
-		end
-	endcase
-end*/
-
-
 cmp cmp(
     .input1(fwdmux1_out),
 	.input2(fwdmux2_out),
@@ -202,11 +156,6 @@ alu alu(
     .b(alu_mux2_out),
     .f(alu_out)
 );
-
-
-
-//assign EX_ctrl_out.pcmux_sel = pcmux::pc_plus4;
-
 
 assign alu_mod2 = {alu_out[31:1], 1'b0};
 assign EX_alu_mod2 = alu_mod2;
@@ -241,12 +190,7 @@ always_comb begin: Muxes
         alumux::rs2_out : alu_mux2_out = fwdmux2_out;
 		  default: alu_mux2_out = fwdmux2_out;
     endcase
-	 /*
-    unique case (EX_ctrl_in.cmpmux_sel) // cmpmux
-        cmpmux::rs2_out  : cmpmux_out = EX_rs2_in;
-        cmpmux::i_imm    : cmpmux_out = i_imm;
-    endcase
-	 */
+	 
 	 unique case(EX_ctrl_in.opcode)
 		op_jal: begin
 			branch_pc_int = EX_pc_out + j_imm;
