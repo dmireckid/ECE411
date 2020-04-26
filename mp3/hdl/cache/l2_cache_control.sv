@@ -1,4 +1,4 @@
-module cache_control (
+module l2_cache_control (
 	input clk,
 	input rst,
 	
@@ -92,10 +92,9 @@ begin : state_actions
 			end
 			
 			write_back: begin
+				dirty_read = 1'b1;
 				dirty_load = 1'b1;
 				dirty_mux = 1'b1;
-				dirty_in = 1'b0;
-				data_read = 1'b1;
 				lru_read = 1'b1;
 				pmem_write = 1'b1;
 				pmem_address = tag_address;
@@ -141,4 +140,4 @@ begin: next_state_assignment
 end
 
 
-endmodule : cache_control
+endmodule : l2_cache_control

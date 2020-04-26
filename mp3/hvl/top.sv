@@ -17,10 +17,10 @@ source_tb tb(
 /****************************** End do not touch *****************************/
 
 /************************ Signals necessary for monitor **********************/
-// This section not required until CP3F
+// This section not required until CP3
 
 assign rvfi.commit = dut.cpu.WB_packet_out.commit; // Set high when a valid instruction is modifying regfile or PC
-//assign rvfi.halt = 0;   // Set high when you detect an infinite loop
+assign rvfi.halt = (dut.cpu.EX.branch_pc == dut.cpu.EX.pc_in && dut.cpu.EX.branch_pc != 0 && dut.cpu.EX.pc_in != 0) ? 1 : 0;   // Set high when you detect an infinite loop
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
 
@@ -64,19 +64,9 @@ assign itf.data_mbe  = dut.cpu.data_mbe;
 //inst_sm_error;
 //data_sm_error;
 /*********************** End Shadow Memory Assignments ***********************/
-//logic halt;
-//assign halt = dut.cpu.IF.pc_load & (dut.cpu.inst_addr == dut.cpu.data_addr);
-
-
-
-/*always @(posedge itf.clk) begin
-    if (halt)
-        $finish;
-end*/
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
-
 
 
 /*********************** Instantiate your design here ************************/

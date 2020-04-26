@@ -32,7 +32,7 @@ assign pc_in = WB_pc_in;
 
 //rvfi_monitor
 	 //synthesis translate_off
-	 assign WB_packet_out.commit = pc_load && WB_ctrl_in.regfile_load;
+	 assign WB_packet_out.commit = 0;//pc_load && WB_ctrl_in.regfile_load;
 	 assign WB_packet_out.inst = WB_packet_in.inst;
 	assign WB_packet_out.trap = WB_packet_in.trap;
 	assign WB_packet_out.rs1_addr = WB_packet_in.rs1_addr;

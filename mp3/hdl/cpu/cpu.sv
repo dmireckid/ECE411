@@ -304,7 +304,7 @@ module cpu(
         .WB_pc_in(MEMWB_pc_out),
 		  .WB_packet_in(MEM_WB_packet_out),
 		  .WB_packet_out,
-		  .pc_load(!stall && ins_resp),
+		  .pc_load(!stall),
 		  .pc_wdata(EX_pcmux_out)
     );
 

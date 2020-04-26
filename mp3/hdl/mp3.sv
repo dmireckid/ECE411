@@ -45,6 +45,14 @@ logic [31:0] icache_mem_rdata;
 logic icache_mem_read;
 logic icache_mem_resp;
 logic icache_hit;
+
+logic [3:0] icache_mem_byte_enable;
+assign icache_mem_byte_enable = 4'b1111;
+logic icache_mem_write, icache_write;
+assign icache_mem_write = 1'b0;
+logic [31:0] icache_mem_wdata;
+assign icache_mem_wdata = 32'b0;
+logic [255:0] icache_wdata;
 	
 /*********end icache signals********/
 
@@ -61,6 +69,17 @@ logic dcache_mem_resp;
 logic dcache_hit;
 
 /**********end dcache signals********/
+
+/*********l2 cache signals*********/
+
+logic l2_resp;
+logic [31:0] l2_mem_address;
+logic l2_mem_read;
+logic l2_mem_write;
+logic [255:0] l2_mem_rdata;
+logic [255:0] l2_mem_wdata; 
+
+/*******end l2 cache signals*******/
 
 cpu cpu(
     .clk,
@@ -79,15 +98,6 @@ cpu cpu(
 	 .icache_hit,
 	 .dcache_hit
 );
-
-
-logic [3:0] icache_mem_byte_enable;
-assign icache_mem_byte_enable = 4'b1111;
-logic icache_mem_write, icache_write;
-assign icache_mem_write = 1'b0;
-logic [31:0] icache_mem_wdata;
-assign icache_mem_wdata = 32'b0;
-logic [255:0] icache_wdata;
 
 cache icache (
     .clk,
@@ -153,7 +163,7 @@ arbiter arbiter (
     .dcache_addr,
     .dcache_resp,
 
-    //arbiter <--> cacheline_adapter
+    //arbiter <--> l2_cache
     .arbiter_resp,
     .arb_mem_address,
     .arb_mem_read,
@@ -162,17 +172,38 @@ arbiter arbiter (
     .arb_mem_wdata  
 );
 
+l2_cache l2_cache (
+	 .clk,
+	 .rst,
+	
+	 //Arbiter <--> Cache
+	 .mem_address(arb_mem_address),
+	 .mem_rdata(arb_mem_rdata),
+	 .mem_wdata(arb_mem_wdata),
+	 .mem_read(arb_mem_read),
+	 .mem_write(arb_mem_write),
+	 .mem_resp(arbiter_resp),
+	
+	 //Cache <--> Cacheline Adaptor
+	 .pmem_address(l2_mem_address),
+	 .pmem_rdata(l2_mem_rdata),
+	 .pmem_wdata(l2_mem_wdata),
+	 .pmem_read(l2_mem_read),
+	 .pmem_write(l2_mem_write),
+	 .pmem_resp(l2_resp)
+);
+
 cacheline_adaptor cacheline_adaptor (
     .clk,
     .reset(rst),
 
     // Port to LLC (Lowest Level Cache)
-    .line_i(arb_mem_wdata),
-    .line_o(arb_mem_rdata),
-    .address_i(arb_mem_address),
-    .read_i(arb_mem_read),
-    .write_i(arb_mem_write),
-    .resp_o(arbiter_resp),
+    .line_i(l2_mem_wdata),
+    .line_o(l2_mem_rdata),
+    .address_i(l2_mem_address),
+    .read_i(l2_mem_read),
+    .write_i(l2_mem_write),
+    .resp_o(l2_resp),
 
     // Port to memory
     .burst_i(mem_rdata),
@@ -182,6 +213,5 @@ cacheline_adaptor cacheline_adaptor (
     .write_o(mem_write),
     .resp_i(mem_resp)
 );
-
 
 endmodule : mp3
