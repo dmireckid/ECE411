@@ -8,6 +8,7 @@ module EX(
     input rv32i_word rs2_in,
     input rv32i_control_word EX_ctrl_in,
     input rv32i_word pc_in,
+	 input logic hazard_stall,
     input logic [1:0] forward1,
     input logic [1:0] forward2,
     input rv32i_word WB_regfile_in,
@@ -61,7 +62,8 @@ assign s_imm = {{21{inst[31]}}, inst[30:25], inst[11:7]};
 assign b_imm = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
 assign u_imm = {inst[31:12], 12'h000};
 assign j_imm = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
-assign rd_temp = rd_out_IDEX;
+assign rd = rd_out_IDEX;
+assign EX_ctrl_out = EX_ctrl_in;
 
 assign EX_u_imm_out = u_imm;
 assign EX_pc_out = pc_in;
@@ -137,7 +139,7 @@ end
 	assign EX_packet_out.pc_wdata = (true_branch) ? branch_pc : (EX_packet_out.pc_rdata + 4);
 	assign EX_packet_out.mem_addr = 0;
 	assign EX_packet_out.mem_rmask = rmask;
-	assign EX_packet_out.mem_wmask = wmask;
+	assign EX_packet_out.mem_wmask = 0;
 	assign EX_packet_out.mem_rdata = 0;
 	assign EX_packet_out.mem_wdata = 0;
 	assign EX_packet_out.errorcode = 0;
@@ -195,19 +197,19 @@ always_comb begin: Muxes
 	 unique case(EX_ctrl_in.opcode)
 		op_jal: begin
 			branch_pc_int = EX_pc_out + j_imm;
-			pcmux_sel_int = EX_ctrl_out.pcmux_sel;
+			pcmux_sel_int = EX_ctrl_in.pcmux_sel;
 			true_branch_int = 1'b1;
 		end
 		
 		op_jalr: begin
 			branch_pc_int = (fwdmux1_out + i_imm) & 32'hFFFFFFFE;
-			pcmux_sel_int = EX_ctrl_out.pcmux_sel;
+			pcmux_sel_int = EX_ctrl_in.pcmux_sel;
 			true_branch_int = 1'b1;
 		end
 		
 		op_br: begin 
 			branch_pc_int = EX_pc_out + b_imm;
-			pcmux_sel_int = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && {1'b0, cmp_out});
+			pcmux_sel_int = pcmux::pcmux_sel_t'(EX_ctrl_in.pcmux_sel && {1'b0, cmp_out});
 			true_branch_int = cmp_out;
 		end
 		
@@ -218,20 +220,21 @@ always_comb begin: Muxes
 		end
 	endcase
 	 
-	 unique case(true_branch)
+	 /*
+	 unique case(hazard_stall)
 				1'b0: begin
 					EX_ctrl_out = EX_ctrl_in;
 					rd = rd_temp;
 				end
 				1'b1: begin
-					EX_ctrl_out = 32'b0;
+					EX_ctrl_out = 32'b0;	
 					rd = 5'b0;
 				end
 				default: begin
 					EX_ctrl_out = EX_ctrl_in;
 					rd = rd_temp;
 				end
-	 endcase
+	 endcase*/
 end
     
 

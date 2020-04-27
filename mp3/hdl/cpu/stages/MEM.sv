@@ -26,12 +26,12 @@ module MEM(
 );
 
 
-    assign data_mbe = MEM_ctrl_in.mem_byte_enable;
+    assign data_mbe = MEM_ctrl_in.mem_byte_enable << alu_out_in[1:0];
     assign data_read = MEM_ctrl_in.mem_read;
     assign data_write = MEM_ctrl_in.mem_write;
     assign data_addr = {alu_out_in[31:2], 2'b00};
     assign MEM_data_read = data_rdata;
-	 assign data_wdata = rs2_in;
+	 assign data_wdata = rs2_in << (8 * alu_out_in[1:0]);
     assign MEM_alu_out = alu_out_in;
     assign MEM_ctrl_out = MEM_ctrl_in;
 	 assign MEM_rd_out = MEM_rd_in;
@@ -41,22 +41,22 @@ module MEM(
  	 //synthesis translate_off
 	 assign MEM_packet_out.commit = 0;
 	 assign MEM_packet_out.inst = MEM_packet_in.inst;
-	assign MEM_packet_out.trap = MEM_packet_in.trap;
-	assign MEM_packet_out.rs1_addr = MEM_packet_in.rs1_addr;
-	assign MEM_packet_out.rs2_addr = MEM_packet_in.rs2_addr;
-	assign MEM_packet_out.rs1_rdata = MEM_packet_in.rs1_rdata ;
-	assign MEM_packet_out.rs2_rdata = MEM_packet_in.rs2_rdata;
-	assign MEM_packet_out.load_regfile = MEM_packet_in.load_regfile;
-	assign MEM_packet_out.rd_addr = 0;
-	assign MEM_packet_out.rd_wdata = MEM_packet_in.rd_wdata;
-	assign MEM_packet_out.pc_rdata = MEM_packet_in.pc_rdata;
-	assign MEM_packet_out.pc_wdata = MEM_packet_in.pc_wdata;
-	assign MEM_packet_out.mem_addr = data_addr;
-	assign MEM_packet_out.mem_rmask = MEM_packet_in.mem_rmask;
-	assign MEM_packet_out.mem_wmask = MEM_packet_in.mem_wmask;
-	assign MEM_packet_out.mem_rdata = data_rdata;
-	assign MEM_packet_out.mem_wdata = data_wdata;
-	assign MEM_packet_out.errorcode = 0;
+	 assign MEM_packet_out.trap = MEM_packet_in.trap;
+	 assign MEM_packet_out.rs1_addr = MEM_packet_in.rs1_addr;
+	 assign MEM_packet_out.rs2_addr = MEM_packet_in.rs2_addr;
+	 assign MEM_packet_out.rs1_rdata = MEM_packet_in.rs1_rdata ;
+	 assign MEM_packet_out.rs2_rdata = MEM_packet_in.rs2_rdata;
+	 assign MEM_packet_out.load_regfile = MEM_packet_in.load_regfile;
+	 assign MEM_packet_out.rd_addr = 0;
+	 assign MEM_packet_out.rd_wdata = MEM_packet_in.rd_wdata;
+	 assign MEM_packet_out.pc_rdata = MEM_packet_in.pc_rdata;
+	 assign MEM_packet_out.pc_wdata = MEM_packet_in.pc_wdata;
+	 assign MEM_packet_out.mem_addr = data_addr;
+	 assign MEM_packet_out.mem_rmask = (data_read) ? data_mbe : 0;
+	 assign MEM_packet_out.mem_wmask = (data_write) ? data_mbe : 0;
+	 assign MEM_packet_out.mem_rdata = data_rdata;
+	 assign MEM_packet_out.mem_wdata = data_wdata;
+	 assign MEM_packet_out.errorcode = 0;
 	 //synthesis translate_on
 
 

@@ -215,6 +215,7 @@ module cpu(
         .rd,
         .EX_u_imm_out,
 	     .EX_alu_mod2,
+		  .hazard_stall,
 		  .pcmux_sel,
         .EX_pc_out,
 		  .branch_pc,
