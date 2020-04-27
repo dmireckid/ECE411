@@ -215,7 +215,7 @@ begin
             ctrl.regfilemux_sel = regfilemux::pc_plus4;
             ctrl.alumux1_sel = alumux::rs1_out;
             ctrl.alumux2_sel = alumux::i_imm;
-            ctrl.pcmux_sel = pcmux::alu_mod2;
+            ctrl.pcmux_sel = pcmux::alu_out;
             //ctrl.aluop = alu_add;
         end
         

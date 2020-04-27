@@ -6,18 +6,15 @@ module WB(
     input logic [31:0] WB_u_imm_in,
     input rv32i_control_word WB_ctrl_in,
     input rv32i_word WB_alu_in,
-	input logic [4:0] WB_rd_in,
+	 input logic [4:0] WB_rd_in,
     input rv32i_word WB_mem_in,
     input rv32i_word WB_pc_in,
     output rv32i_word WB_regfilemux_out,
-	output rv32i_control_word WB_ctrl_out,
-	output logic [4:0] WB_rd_out,
-
+	 output rv32i_control_word WB_ctrl_out,
+	 output logic [4:0] WB_rd_out,
     input RVFIMonPacket WB_packet_in,
 	 output RVFIMonPacket WB_packet_out,
-	 
 	 input logic pc_load,
-	 input rv32i_word pcmux_out,
 	 input rv32i_word pc_wdata
 );
 

@@ -42,7 +42,7 @@ logic cmp_out;
 
 assign EX_rs1_in = rs1_in;
 assign EX_rs2_in = rs2_in;
-assign EX_rs2_out = EX_rs2_in;
+assign EX_rs2_out = fwdmux2_out;
 
 logic true_branch_int;
 assign true_branch = true_branch_int;
@@ -145,9 +145,9 @@ end
 
 cmp cmp(
     .input1(fwdmux1_out),
-	.input2(fwdmux2_out),
-	.cmpop(EX_ctrl_in.cmpop),
-	.br_en(cmp_out)
+	 .input2(fwdmux2_out),
+	 .cmpop(EX_ctrl_in.cmpop),
+	 .br_en(cmp_out)
 );
 
 alu alu(
@@ -194,13 +194,13 @@ always_comb begin: Muxes
 	 unique case(EX_ctrl_in.opcode)
 		op_jal: begin
 			branch_pc_int = EX_pc_out + j_imm;
-			pcmux_sel_int = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && 2'b01);
+			pcmux_sel_int = EX_ctrl_out.pcmux_sel;
 			true_branch_int = 1'b1;
 		end
 		
 		op_jalr: begin
-			branch_pc_int = (EX_rs1_in + i_imm) & 32'hFFFFFFFE;
-			pcmux_sel_int = pcmux::pcmux_sel_t'(EX_ctrl_out.pcmux_sel && 2'b01);
+			branch_pc_int = (fwdmux1_out + i_imm) & 32'hFFFFFFFE;
+			pcmux_sel_int = EX_ctrl_out.pcmux_sel;
 			true_branch_int = 1'b1;
 		end
 		

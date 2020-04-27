@@ -29,7 +29,8 @@ module ID(
 	 output rv32i_word ID_pcmux_out
 );
 
-assign ID_inst_out = inst;
+logic [31:0] inst_int;
+assign ID_inst_out = inst_int;
 rv32i_control_word ctrl_out;
 rv32i_opcode opcode;
 logic [4:0] rs1, rs2, rd_int;
@@ -112,14 +113,17 @@ always_comb begin
 				1'b0: begin
 					ID_ctrl_out = ctrl_out;
 					ID_rd_out = rd_int;
+					inst_int = inst;
 				end
 				1'b1: begin
 					ID_ctrl_out = 32'b0;
 					ID_rd_out = 5'b0;
+					inst_int = 32'b0;
 				end
 				default: begin
 					ID_ctrl_out = ctrl_out;
 					ID_rd_out = rd_int;
+					inst_int = inst;
 				end
 	 endcase
 end
