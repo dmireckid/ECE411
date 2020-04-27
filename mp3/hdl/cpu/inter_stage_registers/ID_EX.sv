@@ -96,7 +96,7 @@ register #(.width(5)) _rd(
 
 register #(.width($bits(RVFIMonPacket))) packet_IDEX(
     .clk,
-    .rst,
+    .rst(rst || true_branch),
     .load(stall),
     .in(ID_EX_packet_in),
     .out(ID_EX_packet_out)
@@ -104,7 +104,7 @@ register #(.width($bits(RVFIMonPacket))) packet_IDEX(
 
 register pcmux_out_IDEX(
     .clk,
-    .rst,
+    .rst(rst || true_branch),
     .load(stall),
     .in(ID_EX_pcmux_in),
     .out(ID_EX_pcmux_out)

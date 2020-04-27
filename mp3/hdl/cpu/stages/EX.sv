@@ -216,7 +216,7 @@ always_comb begin: Muxes
 		default: begin
 			branch_pc_int = 32'b0;
 			true_branch_int = 1'b0;
-			pcmux_sel_int = EX_ctrl_out.pcmux_sel;
+			pcmux_sel_int = EX_ctrl_in.pcmux_sel;
 		end
 	endcase
 	 

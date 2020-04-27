@@ -30,7 +30,7 @@ module MEM(
     assign data_read = MEM_ctrl_in.mem_read;
     assign data_write = MEM_ctrl_in.mem_write;
     assign data_addr = {alu_out_in[31:2], 2'b00};
-    assign MEM_data_read = data_rdata;
+    assign MEM_data_read = data_rdata >> (8 * alu_out_in[1:0]);
 	 assign data_wdata = rs2_in << (8 * alu_out_in[1:0]);
     assign MEM_alu_out = alu_out_in;
     assign MEM_ctrl_out = MEM_ctrl_in;

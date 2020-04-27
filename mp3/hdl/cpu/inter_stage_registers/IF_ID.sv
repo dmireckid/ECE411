@@ -46,7 +46,7 @@ register inst_IFID(
 
 register #(.width($bits(RVFIMonPacket))) packet_IFID(
     .clk,
-    .rst,
+    .rst(rst || true_branch),
     .load(stall),
     .in(IF_ID_packet_in),
     .out(IF_ID_packet_out)
@@ -54,7 +54,7 @@ register #(.width($bits(RVFIMonPacket))) packet_IFID(
 
 register pcmux_out_IFID(
     .clk,
-    .rst,
+    .rst(rst || true_branch),
     .load(stall),
     .in(IF_ID_pcmux_in),
     .out(IF_ID_pcmux_out)
