@@ -29,7 +29,7 @@ assign pc_in = WB_pc_in;
 
 //rvfi_monitor
 	 //synthesis translate_off
-	 assign WB_packet_out.commit = 0;//pc_load && WB_ctrl_in.regfile_load;
+	 assign WB_packet_out.commit = pc_load && WB_packet_in.inst != 0 && WB_packet_in.inst != 8'h00000013;
 	 assign WB_packet_out.inst = WB_packet_in.inst;
 	assign WB_packet_out.trap = WB_packet_in.trap;
 	assign WB_packet_out.rs1_addr = WB_packet_in.rs1_addr;
@@ -38,9 +38,9 @@ assign pc_in = WB_pc_in;
 	assign WB_packet_out.rs2_rdata = WB_packet_in.rs2_rdata;
 	assign WB_packet_out.load_regfile = WB_ctrl_in.regfile_load;
 	assign WB_packet_out.rd_addr = WB_rd_in;
-	assign WB_packet_out.rd_wdata = regfilemux_out;
+	assign WB_packet_out.rd_wdata = (WB_rd_in != 0) ? regfilemux_out : 0;
 	assign WB_packet_out.pc_rdata = WB_packet_in.pc_rdata;
-	assign WB_packet_out.pc_wdata = pc_wdata;
+	assign WB_packet_out.pc_wdata = WB_packet_in.pc_wdata;
 	assign WB_packet_out.mem_addr = WB_packet_in.mem_addr;
 	assign WB_packet_out.mem_rmask = WB_packet_in.mem_rmask;
 	assign WB_packet_out.mem_wmask = WB_packet_in.mem_wmask;

@@ -20,7 +20,6 @@ source_tb tb(
 // This section not required until CP3
 
 assign rvfi.commit = dut.cpu.WB_packet_out.commit; // Set high when a valid instruction is modifying regfile or PC
-assign rvfi.halt = (dut.cpu.EX.branch_pc == dut.cpu.EX.pc_in && dut.cpu.EX.branch_pc != 0 && dut.cpu.EX.pc_in != 0) ? 1 : 0;   // Set high when you detect an infinite loop
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
 
@@ -42,6 +41,9 @@ assign rvfi.mem_rmask = dut.cpu.WB_packet_out.mem_rmask;
 assign rvfi.mem_wmask = dut.cpu.WB_packet_out.mem_wmask;
 assign rvfi.mem_rdata = dut.cpu.WB_packet_out.mem_rdata;
 assign rvfi.mem_wdata = dut.cpu.WB_packet_out.mem_wdata;
+
+assign rvfi.halt = dut.cpu.WB_packet_out.commit & (dut.cpu.WB_packet_out.pc_rdata == dut.cpu.WB_packet_out.pc_wdata);   // Set high when you detect an infinite loop
+
 /**************************** End RVFIMON signals ****************************/
 
 /********************* Assign Shadow Memory Signals Here *********************/

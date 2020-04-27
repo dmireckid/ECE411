@@ -30,7 +30,6 @@ int timeout = 100000000;
 
 always @(posedge tb_itf.clk) begin
     if (rvfi.halt) begin
-        repeat(2) @(posedge itf.clk);
         $finish;
     end
     if (timeout == 0) begin

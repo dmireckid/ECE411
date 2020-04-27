@@ -128,13 +128,13 @@ end
 	assign EX_packet_out.trap = trap;
 	assign EX_packet_out.rs1_addr = EX_packet_in.rs1_addr;
 	assign EX_packet_out.rs2_addr = EX_packet_in.rs2_addr;
-	assign EX_packet_out.rs1_rdata = EX_packet_in.rs1_rdata ;
-	assign EX_packet_out.rs2_rdata = EX_packet_in.rs2_rdata;
+	assign EX_packet_out.rs1_rdata = fwdmux1_out;
+	assign EX_packet_out.rs2_rdata = fwdmux2_out;
 	assign EX_packet_out.load_regfile = EX_packet_in.load_regfile;
 	assign EX_packet_out.rd_addr = 0;
 	assign EX_packet_out.rd_wdata = EX_packet_in.rd_wdata;
-	assign EX_packet_out.pc_rdata = EX_pc_out;
-	assign EX_packet_out.pc_wdata = EX_packet_in.pc_wdata;
+	assign EX_packet_out.pc_rdata = EX_packet_in.pc_rdata;
+	assign EX_packet_out.pc_wdata = (true_branch) ? branch_pc : (EX_packet_out.pc_rdata + 4);
 	assign EX_packet_out.mem_addr = 0;
 	assign EX_packet_out.mem_rmask = rmask;
 	assign EX_packet_out.mem_wmask = wmask;
@@ -142,6 +142,7 @@ end
 	assign EX_packet_out.mem_wdata = 0;
 	assign EX_packet_out.errorcode = 0;
 	 //synthesis translate_on
+
 
 cmp cmp(
     .input1(fwdmux1_out),
