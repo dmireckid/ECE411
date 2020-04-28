@@ -99,6 +99,7 @@ begin : state_actions
 				dirty_in = 1'b0;
 				m_data_read = 1'b1;
 				lru_read = 1'b1;
+				tag_read = 1'b1;
 				pmem_write = 1'b1;
 				pmem_address = tag_address;
 			end
