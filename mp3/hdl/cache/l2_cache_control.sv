@@ -16,6 +16,7 @@ module l2_cache_control (
 	
 	//<--> Cache Control
 	output logic data_read,
+	output logic m_data_read,
 	output logic data_write,
 	output logic datain_mux,
 	output logic tag_load,
@@ -42,7 +43,7 @@ assign clean_miss = !hit && !dirty && read_or_write;
 assign dirty_miss = !hit && dirty && read_or_write; 
 assign read_or_write = (mem_read || mem_write);
 assign resp = hit && read_or_write;
-assign tag_address = {tag_out, mem_address[7:0]};
+assign tag_address = {tag_out, mem_address[7:5], 5'b0};
 
 enum int unsigned {
     /* List of states */
@@ -70,6 +71,7 @@ function void set_defaults();
 	dirty_load = 1'b0;
 	lru_load = 1'b0;
 	lru_read = 1'b0;
+	m_data_read = 1'b0;
 endfunction
 
 always_comb
@@ -92,9 +94,10 @@ begin : state_actions
 			end
 			
 			write_back: begin
-				dirty_read = 1'b1;
 				dirty_load = 1'b1;
 				dirty_mux = 1'b1;
+				dirty_in = 1'b0;
+				m_data_read = 1'b1;
 				lru_read = 1'b1;
 				pmem_write = 1'b1;
 				pmem_address = tag_address;
@@ -103,8 +106,9 @@ begin : state_actions
 			allocate: begin
 				valid_load = 1'b1;
 				datain_mux = pmem_resp;
+				lru_read = 1'b1;
 				pmem_read = 1'b1;
-				pmem_address = mem_address;
+				pmem_address = {mem_address[31:5], 5'b0};
 				if (pmem_resp) tag_load = 1'b1;
 			end
 	endcase	

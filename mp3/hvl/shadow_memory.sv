@@ -77,6 +77,7 @@ initial begin
                         $display("%0t: ShadowMemory Error: Mismatch data_rdata:", $time,
                             " Expected %8h, Detected %8h", rdata_data,
                             sm_itf.smcb.rdata_b);
+                        $display("%8h", sm_itf.smcb.address_b);
                         errcount++;
                     end
                 end

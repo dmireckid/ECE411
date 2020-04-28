@@ -171,7 +171,8 @@ arbiter arbiter (
     .arb_mem_rdata,
     .arb_mem_wdata  
 );
-
+ 
+/*
 l2_cache l2_cache (
 	 .clk,
 	 .rst,
@@ -204,6 +205,27 @@ cacheline_adaptor cacheline_adaptor (
     .read_i(l2_mem_read),
     .write_i(l2_mem_write),
     .resp_o(l2_resp),
+
+    // Port to memory
+    .burst_i(mem_rdata),
+    .burst_o(mem_wdata),
+    .address_o(mem_addr),
+    .read_o(mem_read),
+    .write_o(mem_write),
+    .resp_i(mem_resp)
+);*/
+
+cacheline_adaptor cacheline_adaptor (
+    .clk,
+    .reset(rst),
+
+    // Port to LLC (Lowest Level Cache)
+    .line_i(arb_mem_wdata),
+    .line_o(arb_mem_rdata),
+    .address_i(arb_mem_address),
+    .read_i(arb_mem_read),
+    .write_i(arb_mem_write),
+    .resp_o(arbiter_resp),
 
     // Port to memory
     .burst_i(mem_rdata),

@@ -21,6 +21,7 @@ module l2_cache_datapath #(
 	
 	//<--> Cache Control
 	input logic data_read,
+	input logic m_data_read,
 	input logic data_write,
 	input logic datain_mux,
 	input logic tag_load,
@@ -81,10 +82,10 @@ assign write_en_mux0 = data_write && hit0 || lru0 && datain_mux;
 assign write_en_mux1 = data_write && hit1 || lru1 && datain_mux;
 assign write_en_mux2 = data_write && hit2 || lru2 && datain_mux;
 assign write_en_mux3 = data_write && hit3 || lru3 && datain_mux;
-assign dataout_mux0 = hit0; 
-assign dataout_mux1 = hit1;
-assign dataout_mux2 = hit2;
-assign dataout_mux3 = hit3;
+assign dataout_mux0 = hit0 || (m_data_read && lru0); 
+assign dataout_mux1 = hit1 || (m_data_read && lru1); 
+assign dataout_mux2 = hit2 || (m_data_read && lru2); 
+assign dataout_mux3 = hit3 || (m_data_read && lru3); 
 
 //Tag/Hit
 assign tag_load0 = tag_load && lru0;
@@ -110,7 +111,7 @@ assign dirty_load2 = dirty_load && dirty_mux_out2;
 assign dirty_load3 = dirty_load && dirty_mux_out3;
 
 //LRU
-assign lru_load_internal = lru_load && hit;
+assign lru_load_internal = lru_load || hit;
 assign plru_temp_out = plru_out;
 assign plru_in = plru_temp_in;
 assign lru0 = lru0_temp;
@@ -124,7 +125,7 @@ assign lru3 = lru3_temp;
 data_array line [4](
 		.clk (clk),
 		.rst (rst),
-		.read (data_read),
+		.read (data_read || m_data_read),
 		.write_en ({data_write_en0, data_write_en1, data_write_en2, data_write_en3}),
 		.rindex (index),
 		.windex (index),
@@ -172,7 +173,7 @@ array #(.width(1)) dirty_array [4](
 array #(.width(3)) LRU(
 		.clk (clk),
 		.rst (rst),
-		.read (lru_read),
+		.read (1'b1),
 		.load (lru_load_internal),
 		.rindex (index),
 		.windex (index),
@@ -181,66 +182,71 @@ array #(.width(3)) LRU(
 );
 
 //Decision block for pLRU
-always @(posedge clk) begin
+always_comb begin
 	//Update
 	if (hit) begin
 		if (hit0) begin
-			plru_temp_in[0] <= plru_temp_out[0];
-			plru_temp_in[1] <= 1'b1;
-			plru_temp_in[2] <= 1'b1;
+			plru_temp_in[0] = plru_temp_out[0];
+			plru_temp_in[1] = 1'b1;
+			plru_temp_in[2] = 1'b1;
 		end
 		else if (hit1) begin
-			plru_temp_in[0] <= plru_temp_out[0];
-			plru_temp_in[1] <= 1'b0;
-			plru_temp_in[2] <= 1'b1;
+			plru_temp_in[0] = plru_temp_out[0];
+			plru_temp_in[1] = 1'b0;
+			plru_temp_in[2] = 1'b1;
 		end
 		else if (hit2) begin
-			plru_temp_in[0] <= 1'b1;
-			plru_temp_in[1] <= plru_temp_out[1];
-			plru_temp_in[2] <= 1'b0;
+			plru_temp_in[0] = 1'b1;
+			plru_temp_in[1] = plru_temp_out[1];
+			plru_temp_in[2] = 1'b0;
 		end
 		else if (hit3) begin
-			plru_temp_in[0] <= 1'b0;
-			plru_temp_in[1] <= plru_temp_out[1];
-			plru_temp_in[2] <= 1'b0;
+			plru_temp_in[0] = 1'b0;
+			plru_temp_in[1] = plru_temp_out[1];
+			plru_temp_in[2] = 1'b0;
+		end
+		else begin
+			plru_temp_in[0] = 1'b0;
+			plru_temp_in[1] = 1'b0;
+			plru_temp_in[2] = 1'b0;
 		end
 	end
 	else begin
-		plru_temp_in[0] <= plru_temp_out[0];
-		plru_temp_in[1] <= plru_temp_out[1];
-		plru_temp_in[2] <= plru_temp_out[2];
+		plru_temp_in[0] = plru_temp_out[0];
+		plru_temp_in[1] = plru_temp_out[1];
+		plru_temp_in[2] = plru_temp_out[2];
 	end
 	
 	//Replace
 	if (plru_temp_out[1] == 1'b0 && plru_temp_out[2] == 1'b0) begin
-		lru0_temp <= 1'b1;
-		lru1_temp <= 1'b0;
-		lru2_temp <= 1'b0;
-		lru3_temp <= 1'b0;
+		lru0_temp = 1'b1;
+		lru1_temp = 1'b0;
+		lru2_temp = 1'b0;
+		lru3_temp = 1'b0;
 	end
 	else if (plru_temp_out[1] == 1'b1 && plru_temp_out[2] == 1'b0) begin
-		lru0_temp <= 1'b0;
-		lru1_temp <= 1'b1;
-		lru2_temp <= 1'b0;
-		lru3_temp <= 1'b0;
+		lru0_temp = 1'b0;
+		lru1_temp = 1'b1;
+		lru2_temp = 1'b0;
+		lru3_temp = 1'b0;
 	end
 	else if (plru_temp_out[0] == 1'b0 && plru_temp_out[2] == 1'b1) begin
-		lru0_temp <= 1'b0;
-		lru1_temp <= 1'b0;
-		lru2_temp <= 1'b1;
-		lru3_temp <= 1'b0;
+		lru0_temp = 1'b0;
+		lru1_temp = 1'b0;
+		lru2_temp = 1'b1;
+		lru3_temp = 1'b0;
 	end
 	else if (plru_temp_out[0] == 1'b1 && plru_temp_out[2] == 1'b1) begin
-		lru0_temp <= 1'b0;
-		lru1_temp <= 1'b0;
-		lru2_temp <= 1'b0;
-		lru3_temp <= 1'b1;
+		lru0_temp = 1'b0;
+		lru1_temp = 1'b0;
+		lru2_temp = 1'b0;
+		lru3_temp = 1'b1;
 	end
 	else begin
-		lru0_temp <= 1'b0;
-		lru1_temp <= 1'b0;
-		lru2_temp <= 1'b0;
-		lru3_temp <= 1'b0;
+		lru0_temp = 1'b0;
+		lru1_temp = 1'b0;
+		lru2_temp = 1'b0;
+		lru3_temp = 1'b0;
 	end
 end
 

@@ -24,6 +24,7 @@ module cache_datapath #(
 	
 	//<--> Cache Control
 	input logic data_read,
+	input logic m_data_read,
 	input logic data_write,
 	input logic datain_mux,
 	input logic tag_load,
@@ -79,8 +80,8 @@ assign mem_rdata256 = data;
 assign pmem_wdata = data;
 assign write_en_mux0 = data_write && hit0 || !lru && datain_mux;
 assign write_en_mux1 = data_write && hit1 || lru && datain_mux;
-assign dataout_mux0 = hit0; 
-assign dataout_mux1 = hit1;
+assign dataout_mux0 = hit0 || (m_data_read && !lru); 
+assign dataout_mux1 = hit1 || (m_data_read && lru);
 
 //Tag/Hit
 assign tag_load0 = tag_load && !lru;
@@ -106,7 +107,7 @@ assign lru_load_internal = lru_load && hit;
 data_array line [2](
 		.clk (clk),
 		.rst (rst),
-		.read (data_read),
+		.read (data_read || m_data_read),
 		.write_en ({data_write_en0, data_write_en1}),
 		.rindex (index),
 		.windex (index),

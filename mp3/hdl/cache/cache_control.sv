@@ -16,6 +16,7 @@ module cache_control (
 	
 	//<--> Cache Control
 	output logic data_read,
+	output logic m_data_read,
 	output logic data_write,
 	output logic datain_mux,
 	output logic tag_load,
@@ -70,6 +71,7 @@ function void set_defaults();
 	dirty_load = 1'b0;
 	lru_load = 1'b0;
 	lru_read = 1'b0;
+	m_data_read = 1'b0;
 endfunction
 
 always_comb
@@ -95,7 +97,7 @@ begin : state_actions
 				dirty_load = 1'b1;
 				dirty_mux = 1'b1;
 				dirty_in = 1'b0;
-				data_read = 1'b1;
+				m_data_read = 1'b1;
 				lru_read = 1'b1;
 				pmem_write = 1'b1;
 				pmem_address = tag_address;
@@ -104,6 +106,7 @@ begin : state_actions
 			allocate: begin
 				valid_load = 1'b1;
 				datain_mux = pmem_resp;
+				lru_read = 1'b1;
 				pmem_read = 1'b1;
 				pmem_address = mem_address;
 				if (pmem_resp) tag_load = 1'b1;

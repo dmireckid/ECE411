@@ -68,9 +68,6 @@ set_global_assignment -name EDA_TEST_BENCH_FILE hvl/rvfimon.v -section_id mp3_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/shadow_memory.sv -section_id mp3_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/source_tb.sv -section_id mp3_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/tb_itf.sv -section_id mp3_tb
-set_global_assignment -name SYSTEMVERILOG_FILE hdl/cache/l2_cache_datapath.sv
-set_global_assignment -name SYSTEMVERILOG_FILE hdl/cache/l2_cache_control.sv
-set_global_assignment -name SYSTEMVERILOG_FILE hdl/cache/l2_cache.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/cpu/hazard.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/cpu/forwarding.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/cacheline_adaptor.sv

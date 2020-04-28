@@ -35,7 +35,7 @@ logic [255:0] mem_rdata256;
 logic [31:0] mem_byte_enable256;
 
 //Control
-logic data_read, data_write, datain_mux, tag_read, tag_load, valid_load, valid_read, 
+logic data_read, m_data_read, data_write, datain_mux, tag_read, tag_load, valid_load, valid_read, 
 		dirty_in, dirty_mux, dirty_read, dirty_load, dirty, lru_load, lru_read, hit;
 logic [23:0] tag_out;
 
