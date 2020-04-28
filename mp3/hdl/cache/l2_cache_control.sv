@@ -43,7 +43,7 @@ assign clean_miss = !hit && !dirty && read_or_write;
 assign dirty_miss = !hit && dirty && read_or_write; 
 assign read_or_write = (mem_read || mem_write);
 assign resp = hit && read_or_write;
-assign tag_address = {tag_out, mem_address[7:5], 5'b0};
+assign tag_address = {tag_out, mem_address[7:0]};
 
 enum int unsigned {
     /* List of states */
@@ -98,6 +98,7 @@ begin : state_actions
 				dirty_mux = 1'b1;
 				dirty_in = 1'b0;
 				m_data_read = 1'b1;
+				tag_read = 1'b1;
 				lru_read = 1'b1;
 				pmem_write = 1'b1;
 				pmem_address = tag_address;
@@ -108,7 +109,7 @@ begin : state_actions
 				datain_mux = pmem_resp;
 				lru_read = 1'b1;
 				pmem_read = 1'b1;
-				pmem_address = {mem_address[31:5], 5'b0};
+				pmem_address = mem_address;
 				if (pmem_resp) tag_load = 1'b1;
 			end
 	endcase	
