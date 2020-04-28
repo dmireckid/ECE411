@@ -9,6 +9,8 @@
 `define USE_SHADOW_MEMORY 1
 `define USE_RVFI_MONITOR 1
 
+`include "tb_itf.sv"
+
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
     tb_itf.mem mem_itf,
@@ -29,9 +31,8 @@ end
 int timeout = 100000000;
 
 always @(posedge tb_itf.clk) begin
-    if (rvfi.halt) begin
+    if (rvfi.halt)
         $finish;
-    end
     if (timeout == 0) begin
         $display("TOP: Timed out");
         $finish;
@@ -46,13 +47,16 @@ always @(rvfi.errcode iff (rvfi.errcode != 0)) begin
 end
 
 /************************** End Halting Conditions ***************************/
+`define PARAM_RESPONSE_NS 50 * 10
+`define PARAM_RESPONSE_CYCLES $ceil(`PARAM_RESPONSE_NS / `PERIOD_NS)
+`define PAGE_RESPONSE_CYCLES $ceil(`PARAM_RESPONSE_CYCLES / 2.0)
 
 generate
     if (`MEMORY == `MAGIC_MEM) begin : memory
         magic_memory_dp mem(magic_mem_itf);
     end
     else if (`MEMORY == `PARAM_MEM) begin : memory
-        ParamMemory #(50, 25, 4, 256, 512) mem(mem_itf);
+        ParamMemory #(`PARAM_RESPONSE_CYCLES, `PAGE_RESPONSE_CYCLES, 4, 256, 512) mem(mem_itf);
     end
 endgenerate
 
