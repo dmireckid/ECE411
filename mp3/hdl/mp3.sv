@@ -123,7 +123,7 @@ cache icache (
 );
 
 cache dcache (
-    .clk,
+   .clk,
 	.rst,
 	
 	//CPU Datapath <--> Cache

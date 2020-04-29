@@ -19,15 +19,16 @@ module EX(
     output rv32i_control_word EX_ctrl_out,
     output logic [4:0] rd,
     output [31:0] EX_u_imm_out,
-	output rv32i_word EX_alu_mod2,
-	output pcmux::pcmux_sel_t pcmux_sel,
+	 output rv32i_word EX_alu_mod2,
+	 output pcmux::pcmux_sel_t pcmux_sel,
     output rv32i_word EX_pc_out,
 	 output logic [31:0] branch_pc,
 	 output logic true_branch,
 	 input RVFIMonPacket EX_packet_in,
 	 output RVFIMonPacket EX_packet_out,
 	 input rv32i_word EX_pcmux_in,
-	 output rv32i_word EX_pcmux_out
+	 output rv32i_word EX_pcmux_out,
+	 output logic EX_cmp
 );
 
 
@@ -40,6 +41,7 @@ rv32i_word fwdmux1_out;
 rv32i_word fwdmux2_out;
 
 logic cmp_out;
+assign EX_cmp = cmp_out;
 
 assign EX_rs1_in = rs1_in;
 assign EX_rs2_in = rs2_in;
@@ -48,7 +50,7 @@ assign EX_rs2_out = fwdmux2_out;
 logic true_branch_int;
 assign true_branch = true_branch_int;
 
-logic [31:0] branch_pc_int;
+logic [31:0] branch_pc_int, alu_out_int;
 assign branch_pc = branch_pc_int;
 
 pcmux::pcmux_sel_t pcmux_sel_int;
@@ -76,6 +78,7 @@ rv32i_opcode opcode;
 logic [2:0] funct3;
 assign funct3 = inst[14:12];
 assign opcode = rv32i_opcode'(inst[6:0]);
+assign alu_out = ((arith_funct3_t'(funct3) == slt || arith_funct3_t'(funct3) == sltu) && (EX_ctrl_in.opcode == op_reg || EX_ctrl_in.opcode == op_imm)) ? cmp_out : alu_out_int;
 
 branch_funct3_t branch_funct3;
 store_funct3_t store_funct3;
@@ -105,8 +108,8 @@ begin : trap_check
         op_load: begin
             case (load_funct3)
                 lw: rmask = 4'b1111;
-                lh, lhu: rmask = 4'b0011 /* Modify for MP1 Final */ ;
-                lb, lbu: rmask = 4'b0001 /* Modify for MP1 Final */ ;
+                lh, lhu: rmask = 4'b0011;
+                lb, lbu: rmask = 4'b0001;
                 default: trap = 1;
             endcase
         end
@@ -114,8 +117,8 @@ begin : trap_check
         op_store: begin
             case (store_funct3)
                 sw: wmask = 4'b1111;
-                sh: wmask = 4'b0011 /* Modify for MP1 Final */ ;
-                sb: wmask = 4'b0001 /* Modify for MP1 Final */ ;
+                sh: wmask = 4'b0011;
+                sb: wmask = 4'b0001;
                 default: trap = 1;
             endcase
         end
@@ -124,7 +127,7 @@ begin : trap_check
     endcase
 end
 
-	 //synthesis translate_off
+	//synthesis translate_off
 	assign EX_packet_out.commit = 0;
 	assign EX_packet_out.inst = inst;
 	assign EX_packet_out.trap = trap;
@@ -143,12 +146,12 @@ end
 	assign EX_packet_out.mem_rdata = 0;
 	assign EX_packet_out.mem_wdata = 0;
 	assign EX_packet_out.errorcode = 0;
-	 //synthesis translate_on
+	//synthesis translate_on
 
 
 cmp cmp(
     .input1(fwdmux1_out),
-	 .input2(fwdmux2_out),
+	 .input2((EX_ctrl_in.cmpmux_sel == cmpmux::i_imm) ? i_imm : fwdmux2_out),
 	 .cmpop(EX_ctrl_in.cmpop),
 	 .br_en(cmp_out)
 );
@@ -157,7 +160,7 @@ alu alu(
     .aluop(EX_ctrl_in.aluop),
     .a(alu_mux1_out), 
     .b(alu_mux2_out),
-    .f(alu_out)
+    .f(alu_out_int)
 );
 
 assign alu_mod2 = {alu_out[31:1], 1'b0};
@@ -179,7 +182,14 @@ always_comb begin: Muxes
     endcase
 	 
     unique case (EX_ctrl_in.alumux1_sel) // alumux1
-        alumux::rs1_out: alu_mux1_out = fwdmux1_out;
+        alumux::rs1_out: begin
+				if (EX_ctrl_in.opcode == op_lui) begin
+					alu_mux1_out = 32'b0;
+				end
+				else begin
+					alu_mux1_out = fwdmux1_out;
+				end
+			end
         alumux::pc_out : alu_mux1_out = pc_in;
 		  default: alu_mux1_out = fwdmux1_out;
     endcase
@@ -219,22 +229,6 @@ always_comb begin: Muxes
 			pcmux_sel_int = EX_ctrl_in.pcmux_sel;
 		end
 	endcase
-	 
-	 /*
-	 unique case(hazard_stall)
-				1'b0: begin
-					EX_ctrl_out = EX_ctrl_in;
-					rd = rd_temp;
-				end
-				1'b1: begin
-					EX_ctrl_out = 32'b0;	
-					rd = 5'b0;
-				end
-				default: begin
-					EX_ctrl_out = EX_ctrl_in;
-					rd = rd_temp;
-				end
-	 endcase*/
 end
     
 

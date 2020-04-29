@@ -82,7 +82,6 @@ typedef enum bit [2:0] {
     branch_funct3_t cmpop;
     logic mem_read;
     logic mem_write;
-    //logic pc_load;   Don't need?
     logic regfile_load;
     logic mem_resp;
     logic [3:0] mem_byte_enable;
@@ -91,13 +90,13 @@ typedef enum bit [2:0] {
 
    typedef struct packed {
 
-   logic commit;
-	rv32i_word inst; 
+    logic commit;
+	 rv32i_word inst; 
     logic trap; 
-	rv32i_reg rs1_addr; 
-	rv32i_reg rs2_addr; 
-	rv32i_word rs1_rdata; 
-	rv32i_word rs2_rdata; 
+	 rv32i_reg rs1_addr; 
+	 rv32i_reg rs2_addr; 
+	 rv32i_word rs1_rdata; 
+	 rv32i_word rs2_rdata; 
     logic load_regfile; 
     rv32i_reg rd_addr; 
     rv32i_word rd_wdata; 

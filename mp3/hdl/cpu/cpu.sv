@@ -50,6 +50,7 @@ module cpu(
 	 rv32i_word EX_alu_mod2;
     rv32i_word EX_pc_out;
 	 logic true_branch;
+	 logic EX_cmp;
 
     //Signals for EX_MEM
 	 logic [4:0] rd_in;
@@ -59,13 +60,15 @@ module cpu(
     rv32i_word rs2_out_EXMEM;
     rv32i_word u_imm_out_EXMEM;
     rv32i_word EXMEM_pc_in, EXMEM_pc_out;
+	 logic EX_MEM_cmp;
 
     //Signals for MEM
     logic [31:0] MEM_data_read;
     rv32i_word MEM_alu_out;
     rv32i_control_word MEM_ctrl_out;
 	 logic [4:0] MEM_rd_in, MEM_rd_out;
-    rv32i_word MEM_pc_in, MEM_pc_out;
+    rv32i_word MEM_pc_in, MEM_pc_out, MEM_u_imm_out;
+	 logic MEM_cmp;
 
     //Signals for MEM_WB
     rv32i_word read_data_out_MEMWB;
@@ -74,6 +77,7 @@ module cpu(
     rv32i_word alu_out_MEMWB;
     rv32i_control_word MEMWB_ctrl_out;
     rv32i_word MEMWB_pc_in, MEMWB_pc_out;
+	 logic MEM_WB_cmp;
 
     //Signals for WB
     rv32i_word WB_regfilemux_out;
@@ -94,9 +98,9 @@ module cpu(
 	 logic hazard_stall;
 
      //Signals for RVFI
-	RVFIMonPacket IF_packet_out;
+	 RVFIMonPacket IF_packet_out;
 	 RVFIMonPacket IF_ID_packet_out;
-	RVFIMonPacket ID_packet_out;
+	 RVFIMonPacket ID_packet_out;
 	 RVFIMonPacket ID_EX_packet_out;
 	 RVFIMonPacket EX_packet_out;
 	 RVFIMonPacket EX_MEM_packet_out;
@@ -127,7 +131,6 @@ module cpu(
 		  .IF_packet_out,
 		  .IF_pcmux_out
     );
-    //assign pcmux_sel = EX_ctrl_out.pcmux_sel;
 
     IF_ID IF_ID(
         .clk,
@@ -190,10 +193,10 @@ module cpu(
 		  .hazard_stall,
 		  .true_branch(true_branch && !stall),
 		  .rd_out_IDEX,
-		.ID_EX_packet_in(ID_packet_out),
-		.ID_EX_packet_out,
-		.ID_EX_pcmux_in(ID_pcmux_out),
-		.ID_EX_pcmux_out
+		  .ID_EX_packet_in(ID_packet_out),
+		  .ID_EX_packet_out,
+		  .ID_EX_pcmux_in(ID_pcmux_out),
+		  .ID_EX_pcmux_out
     );
 
     EX EX(
@@ -223,7 +226,8 @@ module cpu(
 		  .EX_packet_in(ID_EX_packet_out),
 		  .EX_packet_out,
 		  .EX_pcmux_in(ID_EX_pcmux_out),
-		  .EX_pcmux_out
+		  .EX_pcmux_out,
+		  .EX_cmp
     );
 
 
@@ -233,6 +237,7 @@ module cpu(
         .rs2_out_IDEX(EX_rs2_out),
         .alu_out,
         .IDEX_ctrl_out(EX_ctrl_out),
+		  .EX_cmp,
 		  .EX_u_imm_in(EX_u_imm_out),
         .rd_in(rd),
         .u_imm_out_EXMEM,
@@ -244,7 +249,8 @@ module cpu(
         .EXMEM_pc_out,
 		  .stall(!stall),
 		  .EX_MEM_packet_in(EX_packet_out),
-		  .EX_MEM_packet_out
+		  .EX_MEM_packet_out,
+		  .EX_MEM_cmp
     );
  
     MEM MEM(
@@ -253,6 +259,8 @@ module cpu(
         .rs2_in(rs2_out_EXMEM),
         .MEM_ctrl_in(EXMEM_ctrl_out),
         .data_rdata,
+		  .EX_MEM_cmp,
+		  .u_imm_in(u_imm_out_EXMEM),
         .alu_out_in(alu_out_EXMEM),
 		  .MEM_rd_in(rd_out_EXMEM),
         .data_wdata,
@@ -265,6 +273,8 @@ module cpu(
         .MEM_ctrl_out,
 		  .MEM_rd_out,
         .MEM_pc_in(EXMEM_pc_out),
+		  .MEM_u_imm_out,
+		  .MEM_cmp,
         .MEM_pc_out,
 		  .MEM_packet_in(EX_MEM_packet_out),
 		  .MEM_packet_out
@@ -274,9 +284,10 @@ module cpu(
         .clk,
         .rst,
         .read_data(MEM_data_read),
-        .u_imm_out_EXMEM(MEM_alu_out),
+        .u_imm_in(MEM_u_imm_out),
         .MEMWB_rd_in(MEM_rd_out),
-        .alu_out_EXMEM,
+        .alu_out_EXMEM(MEM_alu_out),
+		  .MEM_cmp,
         .MEM_ctrl_out,
         .read_data_out_MEMWB,
         .u_imm_out_MEMWB,
@@ -287,13 +298,15 @@ module cpu(
         .MEMWB_pc_out,
 		  .stall(!stall),
 		  .MEM_WB_packet_in(MEM_packet_out),
-		  .MEM_WB_packet_out
+		  .MEM_WB_packet_out,
+		  .MEM_WB_cmp
     );
 
 
     WB WB(
        .clk,
        .rst,
+		 .MEM_WB_cmp,
        .WB_u_imm_in(u_imm_out_MEMWB),
 		 .WB_rd_in(rd_out_MEMWB),
        .WB_ctrl_in(MEMWB_ctrl_out),

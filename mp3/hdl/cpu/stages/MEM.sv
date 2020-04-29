@@ -9,7 +9,8 @@ module MEM(
     input rv32i_word alu_out_in,
 	 input logic [4:0] MEM_rd_in,
     input rv32i_word MEM_pc_in,
-
+	 input rv32i_word u_imm_in,
+	 input logic EX_MEM_cmp,
     output logic [31:0] data_wdata,
     output logic [31:0] data_addr,
     output logic [3:0] data_mbe,
@@ -20,7 +21,8 @@ module MEM(
     output rv32i_control_word MEM_ctrl_out,
 	 output logic [4:0] MEM_rd_out,
     output rv32i_word MEM_pc_out,
-
+	 output rv32i_word MEM_u_imm_out,
+	 output logic MEM_cmp,
     input RVFIMonPacket MEM_packet_in,
 	 output RVFIMonPacket MEM_packet_out
 );
@@ -36,6 +38,8 @@ module MEM(
     assign MEM_ctrl_out = MEM_ctrl_in;
 	 assign MEM_rd_out = MEM_rd_in;
     assign MEM_pc_out = MEM_pc_in;
+	 assign MEM_u_imm_out = u_imm_in;
+	 assign MEM_cmp = EX_MEM_cmp;
 
 	 //rvfi_monitor
  	 //synthesis translate_off

@@ -5,6 +5,7 @@ module EX_MEM(
     input rst,
     input rv32i_word rs2_out_IDEX,
     input rv32i_word alu_out,
+	 input logic EX_cmp,
     input rv32i_word IDEX_ctrl_out,
     input logic [4:0] rd_in,
     input rv32i_word EX_u_imm_in,
@@ -16,7 +17,7 @@ module EX_MEM(
     output rv32i_word rs2_out_EXMEM,
     output rv32i_word u_imm_out_EXMEM,
     output rv32i_word EXMEM_pc_out,
-	 
+	 output logic EX_MEM_cmp,
 	 input RVFIMonPacket EX_MEM_packet_in,
 	 output RVFIMonPacket EX_MEM_packet_out
 );
@@ -51,6 +52,14 @@ register #(.width(5)) rd_EXMEM(
     .load(stall),
     .in(rd_in),
     .out(rd_out_EXMEM)
+);
+
+register #(.width(1)) cmp_EXMEM(
+    .clk,
+    .rst,
+    .load(stall),
+    .in(EX_cmp),
+    .out(EX_MEM_cmp)
 );
 
 register u_imm_EXMEM(

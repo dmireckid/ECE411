@@ -6,8 +6,6 @@ module control_rom(
     input logic [2:0] funct3,
 
     output rv32i_control_word ctrl
-
-
 );
 
 
@@ -24,7 +22,6 @@ begin
     ctrl.cmpop = branch_funct3_t'(3'b000);
     ctrl.mem_read = 1'b0;
     ctrl.mem_write = 1'b0;
-    //ctrl.pc_load = 1'b0;   Don't need?
     ctrl.regfile_load = 1'b0;
     ctrl.mem_resp = 1'b0;
     ctrl.mem_byte_enable = 4'b1111;
@@ -33,7 +30,10 @@ begin
     /* Assign control signals based on opcode */
     case(opcode)
         op_lui: begin
+				ctrl.aluop = alu_add;
             ctrl.regfilemux_sel = regfilemux::u_imm;
+				ctrl.alumux1_sel = alumux::rs1_out;
+				ctrl.alumux2_sel = alumux::u_imm;
             ctrl.regfile_load = 1'b1;
         end
         
@@ -81,16 +81,15 @@ begin
                 sw: ctrl.mem_byte_enable = 4'b1111;
                 default: ctrl.mem_byte_enable = 4'b1111;
             endcase
-            //sb sh sw?
         end
 
         op_imm: begin
             ctrl.regfile_load = 1;
             case (arith_funct3_t'(funct3))
                 slt: begin
-                    ctrl.cmpop = blt;
-					ctrl.regfilemux_sel = regfilemux::br_en;
-					ctrl.cmpmux_sel = cmpmux::i_imm;
+							ctrl.cmpop = blt;
+							ctrl.regfilemux_sel = regfilemux::br_en;
+							ctrl.cmpmux_sel = cmpmux::i_imm;
                 end
 
                 sltu: begin
@@ -200,23 +199,19 @@ begin
         end
         
         op_jal: begin
-            //load_pc = 1;
             ctrl.regfile_load = 1;
             ctrl.regfilemux_sel = regfilemux::pc_plus4;
             ctrl.alumux1_sel = alumux::pc_out;
             ctrl.alumux2_sel = alumux::j_imm;
             ctrl.pcmux_sel = pcmux::alu_out;
-            //ctrl.aluop = alu_add;
         end
      
         op_jalr: begin
-            //load_pc = 1;
             ctrl.regfile_load = 1;
             ctrl.regfilemux_sel = regfilemux::pc_plus4;
             ctrl.alumux1_sel = alumux::rs1_out;
             ctrl.alumux2_sel = alumux::i_imm;
             ctrl.pcmux_sel = pcmux::alu_out;
-            //ctrl.aluop = alu_add;
         end
         
         default: begin
