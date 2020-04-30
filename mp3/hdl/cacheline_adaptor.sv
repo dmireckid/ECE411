@@ -209,32 +209,45 @@ begin : next_state_logic
     unique case (state)
             read_or_write: begin
                 if(read_i == 1'b1) next_states = read_begin;
-                if(write_i == 1'b1) next_states = write_begin;
+                else if(write_i == 1'b1) next_states = write_begin;
+					 else next_states = read_or_write;
             end
 
             read_begin:     next_states = read1;
 
-            read1:          if(resp_i == 1'b1) next_states = read2;
-
+            read1: begin
+					 if(resp_i == 1'b1) next_states = read2;
+					 else next_states = read1;
+				end
+				
             read2:          next_states = read3;
 
             read3:          next_states = read4;
 
             read4:          next_states = read_finish;
 
-            read_finish:    if(resp_i == 1'b0) next_states = read_or_write; 
-
+            read_finish: begin
+					 if(resp_i == 1'b0) next_states = read_or_write;	
+					 else next_states = read_finish;
+				end
+				
             write_begin:    next_states = write1;
 
-            write1:         if(resp_i == 1'b1) next_states = write2;
-
+            write1: begin
+					 if(resp_i == 1'b1) next_states = write2;
+					 else next_states = write1;
+				end 
+				
             write2:         next_states = write3;
 
             write3:         next_states = write4;
 
             write4:         next_states = write_finish;
 
-            write_finish:   if(resp_i == 1'b0) next_states = read_or_write;
+            write_finish: begin
+					 if(resp_i == 1'b0) next_states = read_or_write;
+					 else next_states = write_finish;
+				end
     endcase
 end
 

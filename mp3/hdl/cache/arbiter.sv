@@ -18,15 +18,33 @@ module arbiter(
 
     //arbiter <--> cacheline_adapter
     input logic arbiter_resp,
-    output logic [31:0] arb_mem_address,
-    output logic arb_mem_read,
-    output logic arb_mem_write,
+    output logic [31:0] arb_mem_address_buf,
+    output logic arb_mem_read_buf,
+    output logic arb_mem_write_buf,
     input logic [255:0] arb_mem_rdata,
-    output logic [255:0] arb_mem_wdata
+    output logic [255:0] arb_mem_wdata_buf
 );
 
 logic dcache_request;
 assign dcache_request = dcache_read || dcache_write;
+
+logic arb_mem_read, arb_mem_write;
+logic [31:0] arb_mem_address;
+logic [255:0] arb_mem_wdata;
+
+always_ff @(posedge clk) begin
+	if (rst) begin
+		arb_mem_read_buf <= '0;
+		arb_mem_write_buf <= '0;
+		arb_mem_address_buf <= '0;
+		arb_mem_wdata_buf <= '0;
+	end else begin
+		arb_mem_read_buf <= arb_mem_read;
+		arb_mem_write_buf <= arb_mem_write;
+		arb_mem_address_buf <= arb_mem_address;
+		arb_mem_wdata_buf <= arb_mem_wdata;
+	end
+end
 
 function void set_defaults();
 	icache_data = 256'b0;
@@ -99,13 +117,13 @@ begin : next_state_logic
 				
         instruction:
             begin
-            if(arbiter_resp) next_states = idle;
+            if(icache_resp) next_states = idle;//arbiter_resp
             else next_states = instruction;
             end
 				
         data:
             begin
-            if(arbiter_resp) next_states = idle;
+            if(dcache_resp) next_states = idle;//
             else next_states = data;
             end
     endcase

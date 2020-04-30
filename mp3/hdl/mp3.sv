@@ -151,25 +151,25 @@ arbiter arbiter (
 
     //icache <--> arbiter
     .icache_read,
-    .icache_data,
+    .icache_data(icache_data),
     .icache_addr,
-    .icache_resp,
+    .icache_resp(icache_resp),
 
     //dcache <--> arbiter
     .dcache_read,
     .dcache_write,
     .dcache_wdata,
-    .dcache_rdata,
+    .dcache_rdata(dcache_rdata),
     .dcache_addr,
-    .dcache_resp,
+    .dcache_resp(dcache_resp),
 
     //arbiter <--> l2_cache
     .arbiter_resp,
-    .arb_mem_address,
-    .arb_mem_read,
-    .arb_mem_write,
+    .arb_mem_address_buf(arb_mem_address),
+    .arb_mem_read_buf(arb_mem_read),
+    .arb_mem_write_buf(arb_mem_write),
     .arb_mem_rdata,
-    .arb_mem_wdata  
+    .arb_mem_wdata_buf(arb_mem_wdata)  
 );
  
 l2_cache l2_cache (
